@@ -72,35 +72,6 @@ A modern Agile Management Tool that enables teams to collaborate, manage project
 * JWT (JSON Web Token)
 * bcrypt
 
-## 📂 Project Structure
-
-```text
-Agile-management-tool/
-│
-├── frontend/
-│   ├── src/
-│   ├── public/
-│   └── package.json
-│
-├── backend/
-│   ├── controllers/
-│   ├── routes/
-│   ├── models/
-│   ├── middleware/
-│   └── server.js
-│
-└── README.md
-```
-
-## ⚙️ Installation
-
-### Clone Repository
-
-```bash
-git clone <repository-url>
-cd Agile-management-tool
-```
-
 ### Frontend Setup
 
 ```bash
