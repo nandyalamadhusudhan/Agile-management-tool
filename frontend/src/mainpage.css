@@ -1,0 +1,7 @@
+.page-content {
+  margin-top: 70px;
+  margin-left: 260px;
+  padding: 25px;
+  min-height: calc(100vh - 70px);
+  background-color: #f1f5f9;
+}

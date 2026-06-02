@@ -1,0 +1,107 @@
+/* navbar.css */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.navbar {
+  height: 70px;
+  background-color: #0f172a;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 25px;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+
+  z-index: 1000;
+}
+/* Search Box */
+
+.search-box {
+  background-color: white;
+
+  width: 320px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+
+  border-radius: 8px;
+
+  padding: 0 12px;
+}
+
+.search-icon {
+  color: gray;
+  font-size: 15px;
+}
+
+.search-box input {
+  width: 100%;
+  border: none;
+  outline: none;
+
+  margin-left: 10px;
+  font-size: 15px;
+}
+
+/* Nav Links */
+
+.nav-links {
+  display: flex;
+  gap: 25px;
+
+  list-style: none;
+}
+
+.nav-links li {
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.nav-links li:hover {
+  color: #38bdf8;
+}
+
+/* Right Section */
+
+.right-section {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.video-btn {
+  background-color: #0ea5e9;
+  color: white;
+
+  border: none;
+  padding: 10px 16px;
+
+  border-radius: 8px;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  cursor: pointer;
+}
+
+.nav-icon {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.profile-icon {
+  font-size: 32px;
+  cursor: pointer;
+}
