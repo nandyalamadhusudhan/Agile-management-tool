@@ -5,24 +5,14 @@ import Register from "./components/register";
 import Mainpage from "./components/mainpage";
 
 function App() {
-
-  const [isloggedin, setisloggedin] =
-    useState(false);
-
-  const [page, setpage] =
-    useState("Home");
-
+  const [isloggedin, setisloggedin] =useState(false);
+  const [page, setpage] =useState("Home");
   useEffect(() => {
-
-    const token =
-      localStorage.getItem("token");
-
+    const token =localStorage.getItem("token");
     if (token) {
       setisloggedin(true);
     }
-
   }, []);
-
   if (isloggedin) {
     return (
       <Mainpage
@@ -30,7 +20,6 @@ function App() {
       />
     );
   }
-
   if (page === "login") {
     return (
       <Login

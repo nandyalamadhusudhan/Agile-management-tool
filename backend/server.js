@@ -167,17 +167,56 @@ app.get("/dashboard", authMiddleware, async (req, res) => {
 
   }
 });
-// Protected Route
-/*app.get("/dashboard", authMiddleware, (req, res) => {
-  res.status(200).json({
-    message: "Welcome to Dashboard",
-    user: req.user,
-  });
+app.post("/workspace/create", authMiddleware, async (req, res) => {
+  try {
+    const { workspaceName, description } = req.body;
+
+    const workspace = new Workspace({
+      name: workspaceName,
+      description,
+      owner: req.user.id,
+      members: [req.user.id]
+    });
+
+    await workspace.save();
+
+    res.status(201).json({
+      message: "Workspace Created Successfully",
+      workspace
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: error.message
+    });
+  }
 });
-const {
-  getDashboardStats
-} = require("./models/dashboardController");
-app.get("/dashboard",authMiddleware,getDashboardStats);*/
+app.get("/workspace/count", authMiddleware, async (req, res) => {
+  try {
+    const count = await Workspace.countDocuments();
+
+    res.status(200).json({
+      count,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+});
+app.get("/workspace/all", authMiddleware, async (req, res) => {
+  try {
+    const workspaces = await Workspace.find()
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(workspaces);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+});
 // Start Server
 app.listen(5000, () => {
   console.log("Server running on port 5000");

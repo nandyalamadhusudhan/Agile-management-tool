@@ -2,6 +2,7 @@ import { useState } from "react";
 import Navbar from "../components/navbar";
 import Sidebar from "../components/sidebar";
 import Dashboard from "../components/dashboard";
+import Workspace from "../components/workspace";
 import "../mainpage.css";
 
 function Mainpage({ setisloggedin }) {
@@ -23,7 +24,7 @@ function Mainpage({ setisloggedin }) {
         )}
 
         {page === "workspace" && (
-          <h1>Workspace Page</h1>
+          <Workspace />
         )}
 
         {page === "teams" && (
