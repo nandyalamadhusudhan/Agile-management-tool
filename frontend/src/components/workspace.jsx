@@ -101,17 +101,14 @@ function Workspace() {
       );
     }
   };
-
   return (
     <div className="workspace-container">
       <h1>Workspace Dashboard</h1>
-
       <div className="workspace-header">
         <div className="workspace-count-card">
           <h3>Total Workspaces</h3>
           <span>{workspaceCount}</span>
         </div>
-
         <button
           className="create-btn"
           onClick={() => setShowModal(true)}
@@ -119,7 +116,6 @@ function Workspace() {
           + Create Workspace
         </button>
       </div>
-
       <div className="workspace-list">
         {workspaces.length === 0 ? (
           <p>No workspaces found.</p>
@@ -130,13 +126,11 @@ function Workspace() {
               className="workspace-card"
             >
               <h3>{workspace.name}</h3>
-
               <p>
                 <strong>Description:</strong>{" "}
                 {workspace.description ||
                   "No Description"}
               </p>
-
               <p>
                 <strong>Created At:</strong>{" "}
                 {new Date(
@@ -147,12 +141,10 @@ function Workspace() {
           ))
         )}
       </div>
-
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-box">
             <h2>Create Workspace</h2>
-
             <input
               type="text"
               name="workspaceName"
@@ -160,19 +152,16 @@ function Workspace() {
               value={workspaceData.workspaceName}
               onChange={handleChange}
             />
-
             <textarea
               name="description"
               placeholder="Description"
               value={workspaceData.description}
               onChange={handleChange}
             />
-
             <div className="modal-buttons">
               <button onClick={createWorkspace}>
                 Create
               </button>
-
               <button
                 className="cancel-btn"
                 onClick={() => setShowModal(false)}
@@ -186,5 +175,4 @@ function Workspace() {
     </div>
   );
 }
-
 export default Workspace;

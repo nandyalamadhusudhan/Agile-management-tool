@@ -3,7 +3,6 @@ import Home from "./components/homepage";
 import Login from "./components/login";
 import Register from "./components/register";
 import Mainpage from "./components/mainpage";
-
 function App() {
   const [isloggedin, setisloggedin] =useState(false);
   const [page, setpage] =useState("Home");

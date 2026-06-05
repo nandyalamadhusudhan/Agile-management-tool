@@ -45,7 +45,6 @@ function Sidebar() {
 
             <div className="child3">
               <h3>Workspace</h3>
-
               <div className="child3-1">
                 <ul>
                   <li>Projects</li>
