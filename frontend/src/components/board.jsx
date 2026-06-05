@@ -1,212 +1,137 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, useLocation } from "react-router-dom";
+import axios from "axios";
 import "../board.css";
+
 function Board() {
-  const { workspaceId } = useParams();
+  const { id } = useParams();
+  const location = useLocation();
 
-  const [showTaskModal, setShowTaskModal] = useState(false);
+  const workspaceId = id || location.state?.workspaceId;
+  const workspaceName = location.state?.workspaceName;
 
-  const [members] = useState([
-    { _id: "1", name: "Madhu" },
-    { _id: "2", name: "Ravi" },
-    { _id: "3", name: "John" },
-  ]);
+  const [boards, setBoards] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [title, setTitle] = useState("");
 
-  const [tasks, setTasks] = useState([]);
-
-  const [taskData, setTaskData] = useState({
-    title: "",
-    description: "",
-    assignedTo: "",
-  });
-
-  const createTask = () => {
-    if (!taskData.title) {
-      alert("Enter task title");
-      return;
+  useEffect(() => {
+    if (workspaceId) {
+      fetchBoards();
+      fetchMembers();
     }
+  }, [workspaceId]);
 
-    const selectedMember = members.find(
-      (member) => member._id === taskData.assignedTo
-    );
+  // GET BOARDS
+  const fetchBoards = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-    const newTask = {
-      _id: Date.now(),
-      title: taskData.title,
-      description: taskData.description,
-      assignedTo: selectedMember?.name || "Unassigned",
-      status: "Todo",
-    };
+      const res = await axios.get(
+        `http://localhost:5000/boards/${workspaceId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-    setTasks([...tasks, newTask]);
+      setBoards(res.data);
+    } catch (err) {
+      console.log(err.response?.data || err.message);
+    }
+  };
 
-    setTaskData({
-      title: "",
-      description: "",
-      assignedTo: "",
-    });
+  // GET MEMBERS
+  const fetchMembers = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-    setShowTaskModal(false);
+      const res = await axios.get(
+        `http://localhost:5000/workspace/${workspaceId}/members`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setMembers(res.data);
+    } catch (err) {
+      console.log(err.response?.data || err.message);
+    }
+  };
+
+  // CREATE BOARD
+  const createBoard = async () => {
+    if (!title.trim()) return;
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await axios.post(
+        "http://localhost:5000/boards",
+        {
+          title,
+          workspace: workspaceId,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setBoards([...boards, res.data]);
+      setTitle("");
+    } catch (err) {
+      console.log(err.response?.data || err.message);
+    }
+  };
+
+  // DELETE BOARD
+  const deleteBoard = async (boardId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await axios.delete(
+        `http://localhost:5000/boards/${boardId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setBoards(boards.filter((b) => b._id !== boardId));
+    } catch (err) {
+      console.log(err.response?.data || err.message);
+    }
   };
 
   return (
-    <div className="board-page">
-      <div className="board-header">
-        <h1>Workspace Board</h1>
+    <div>
+      <h2>{workspaceName || "Workspace Board"}</h2>
 
-        <button
-          className="create-btn"
-          onClick={() => setShowTaskModal(true)}
-        >
-          + Add Task
-        </button>
+      <div>
+        <h4>Members</h4>
+        {members.map((m) => (
+          <span key={m._id}>{m.name}</span>
+        ))}
       </div>
 
-      <p>
-        <strong>Workspace ID:</strong> {workspaceId}
-      </p>
+      <div>
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Board name"
+        />
 
-      <div className="board-container">
-
-        {/* TODO */}
-        <div className="board-column">
-          <h2>Todo</h2>
-
-          {tasks
-            .filter((task) => task.status === "Todo")
-            .map((task) => (
-              <div className="task-card" key={task._id}>
-                <h4>{task.title}</h4>
-
-                <p>{task.description}</p>
-
-                <p>
-                  <strong>Assigned To:</strong>{" "}
-                  {task.assignedTo}
-                </p>
-              </div>
-            ))}
-        </div>
-
-        {/* IN PROGRESS */}
-        <div className="board-column">
-          <h2>In Progress</h2>
-
-          {tasks
-            .filter(
-              (task) => task.status === "In Progress"
-            )
-            .map((task) => (
-              <div className="task-card" key={task._id}>
-                <h4>{task.title}</h4>
-
-                <p>{task.description}</p>
-
-                <p>
-                  <strong>Assigned To:</strong>{" "}
-                  {task.assignedTo}
-                </p>
-              </div>
-            ))}
-        </div>
-
-        {/* COMPLETED */}
-        <div className="board-column">
-          <h2>Completed</h2>
-
-          {tasks
-            .filter(
-              (task) => task.status === "Completed"
-            )
-            .map((task) => (
-              <div className="task-card" key={task._id}>
-                <h4>{task.title}</h4>
-
-                <p>{task.description}</p>
-
-                <p>
-                  <strong>Assigned To:</strong>{" "}
-                  {task.assignedTo}
-                </p>
-              </div>
-            ))}
-        </div>
+        <button onClick={createBoard}>Create</button>
       </div>
 
-      {/* ADD TASK MODAL */}
-      {showTaskModal && (
-        <div className="modal-overlay">
-          <div className="modal">
+      <div>
+        {boards.map((b) => (
+          <div key={b._id}>
+            <h3>{b.title}</h3>
 
-            <h2>Create Task</h2>
-
-            <input
-              type="text"
-              placeholder="Task Title"
-              value={taskData.title}
-              onChange={(e) =>
-                setTaskData({
-                  ...taskData,
-                  title: e.target.value,
-                })
-              }
-            />
-
-            <textarea
-              placeholder="Task Description"
-              value={taskData.description}
-              onChange={(e) =>
-                setTaskData({
-                  ...taskData,
-                  description: e.target.value,
-                })
-              }
-            />
-
-            <select
-              value={taskData.assignedTo}
-              onChange={(e) =>
-                setTaskData({
-                  ...taskData,
-                  assignedTo: e.target.value,
-                })
-              }
-            >
-              <option value="">
-                Select Member
-              </option>
-
-              {members.map((member) => (
-                <option
-                  key={member._id}
-                  value={member._id}
-                >
-                  {member.name}
-                </option>
-              ))}
-            </select>
-
-            <div className="modal-buttons">
-              <button
-                className="create-btn"
-                onClick={createTask}
-              >
-                Create Task
-              </button>
-
-              <button
-                className="cancel-btn"
-                onClick={() =>
-                  setShowTaskModal(false)
-                }
-              >
-                Cancel
-              </button>
-            </div>
-
+            <button onClick={() => deleteBoard(b._id)}>
+              Delete
+            </button>
           </div>
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
 }

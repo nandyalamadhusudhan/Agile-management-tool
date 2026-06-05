@@ -5,61 +5,63 @@ import "../workspace.css";
 
 function Workspace() {
   const navigate = useNavigate();
+
   const [showModal, setShowModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
+
   const [workspaceCount, setWorkspaceCount] = useState(0);
   const [workspaces, setWorkspaces] = useState([]);
+
   const [selectedWorkspace, setSelectedWorkspace] = useState("");
+  const [memberEmail, setMemberEmail] = useState("");
+
   const [workspaceData, setWorkspaceData] = useState({
     workspaceName: "",
     description: "",
   });
-  const [memberEmail, setMemberEmail] = useState("");
+
   useEffect(() => {
     fetchWorkspaceCount();
     fetchWorkspaces();
   }, []);
-  // FETCH WORKSPACE COUNT
+
+  // GET COUNT
   const fetchWorkspaceCount = async () => {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await axios.get(
+      const res = await axios.get(
         "http://localhost:5000/workspace/count",
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      setWorkspaceCount(response.data.count);
-    } catch (error) {
-      console.error(error);
+      setWorkspaceCount(res.data.count);
+    } catch (err) {
+      console.log(err.response?.data || err.message);
     }
   };
 
-  // FETCH ALL WORKSPACES
+  // GET WORKSPACES
   const fetchWorkspaces = async () => {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await axios.get(
+      const res = await axios.get(
         "http://localhost:5000/workspace/all",
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      setWorkspaces(response.data);
-    } catch (error) {
-      console.error(error);
+      setWorkspaces(res.data);
+    } catch (err) {
+      console.log(err.response?.data || err.message);
     }
   };
 
-  // HANDLE INPUT CHANGE
+  // INPUT CHANGE
   const handleChange = (e) => {
     setWorkspaceData({
       ...workspaceData,
@@ -74,37 +76,26 @@ function Workspace() {
 
       await axios.post(
         "http://localhost:5000/workspace/create",
+        workspaceData,
         {
-          workspaceName: workspaceData.workspaceName,
-          description: workspaceData.description,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      alert("Workspace Created Successfully");
-
-      await fetchWorkspaceCount();
-      await fetchWorkspaces();
-
-      setWorkspaceData({
-        workspaceName: "",
-        description: "",
-      });
-
       setShowModal(false);
-    } catch (error) {
-      console.error(error);
-      alert(error.response?.data?.message || "Failed to create workspace");
+      setWorkspaceData({ workspaceName: "", description: "" });
+
+      fetchWorkspaceCount();
+      fetchWorkspaces();
+    } catch (err) {
+      console.log(err.response?.data || err.message);
     }
   };
 
-  // OPEN INVITE MODAL
+  // OPEN INVITE
   const openInviteModal = (workspaceId) => {
     setSelectedWorkspace(workspaceId);
+    setMemberEmail("");
     setShowInviteModal(true);
   };
 
@@ -120,27 +111,23 @@ function Workspace() {
           email: memberEmail,
         },
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      alert("Member Added Successfully");
-
-      setMemberEmail("");
       setShowInviteModal(false);
-    } catch (error) {
-      alert(error.response?.data?.message || "Failed to add member");
+      setMemberEmail("");
+    } catch (err) {
+      console.log(err.response?.data || err.message);
     }
   };
 
-  // OPEN BOARD
+  // NAVIGATE TO BOARD
   const openWorkspaceBoard = (workspace) => {
     navigate(`/workspace/${workspace._id}`, {
       state: {
-        workspaceName: workspace.workspaceName,
         workspaceId: workspace._id,
+        workspaceName: workspace.name,
       },
     });
   };
@@ -152,130 +139,69 @@ function Workspace() {
       <div className="workspace-summary">
         <h3>Total Workspaces: {workspaceCount}</h3>
 
-        <button
-          className="create-btn"
-          onClick={() => setShowModal(true)}
-        >
+        <button onClick={() => setShowModal(true)}>
           + Create Workspace
         </button>
       </div>
 
-      {/* WORKSPACES */}
       <div className="workspace-list">
-        {workspaces.length === 0 ? (
-          <p>No workspaces found.</p>
-        ) : (
-          workspaces.map((workspace) => (
-            <div
-              className="workspace-card"
-              key={workspace._id}
-              onClick={() => openWorkspaceBoard(workspace)}
-              style={{ cursor: "pointer" }}
+        {workspaces.map((workspace) => (
+          <div
+            key={workspace._id}
+            className="workspace-card"
+            onClick={() => openWorkspaceBoard(workspace)}
+          >
+            <h3>{workspace.name}</h3>
+
+            <p>{workspace.description || "No Description"}</p>
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                openInviteModal(workspace._id);
+              }}
             >
-              <h3>
-                {workspace.workspaceName || workspace.name}
-              </h3>
-
-              <p>
-                <strong>Description:</strong>{" "}
-                {workspace.description || "No Description"}
-              </p>
-
-              <p>
-                <strong>Created At:</strong>{" "}
-                {new Date(
-                  workspace.createdAt
-                ).toLocaleDateString()}
-              </p>
-
-              <button
-                className="member-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openInviteModal(workspace._id);
-                }}
-              >
-                Add Members
-              </button>
-            </div>
-          ))
-        )}
+              Add Members
+            </button>
+          </div>
+        ))}
       </div>
 
-      {/* CREATE WORKSPACE MODAL */}
+      {/* CREATE MODAL */}
       {showModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2>Create Workspace</h2>
+        <div className="modal">
+          <input
+            name="workspaceName"
+            value={workspaceData.workspaceName}
+            onChange={handleChange}
+            placeholder="Workspace Name"
+          />
 
-            <input
-              type="text"
-              name="workspaceName"
-              placeholder="Workspace Name"
-              value={workspaceData.workspaceName}
-              onChange={handleChange}
-            />
+          <input
+            name="description"
+            value={workspaceData.description}
+            onChange={handleChange}
+            placeholder="Description"
+          />
 
-            <input
-              type="text"
-              name="description"
-              placeholder="Description"
-              value={workspaceData.description}
-              onChange={handleChange}
-            />
-
-            <div className="modal-buttons">
-              <button
-                className="create-btn"
-                onClick={createWorkspace}
-              >
-                Create
-              </button>
-
-              <button
-                className="cancel-btn"
-                onClick={() => setShowModal(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
+          <button onClick={createWorkspace}>Create</button>
+          <button onClick={() => setShowModal(false)}>Cancel</button>
         </div>
       )}
 
-      {/* INVITE MEMBER MODAL */}
+      {/* INVITE MODAL */}
       {showInviteModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2>Add Member</h2>
+        <div className="modal">
+          <input
+            value={memberEmail}
+            onChange={(e) => setMemberEmail(e.target.value)}
+            placeholder="Email"
+          />
 
-            <input
-              type="email"
-              placeholder="Enter member email"
-              value={memberEmail}
-              onChange={(e) =>
-                setMemberEmail(e.target.value)
-              }
-            />
-
-            <div className="modal-buttons">
-              <button
-                className="create-btn"
-                onClick={inviteMember}
-              >
-                Add Member
-              </button>
-
-              <button
-                className="cancel-btn"
-                onClick={() =>
-                  setShowInviteModal(false)
-                }
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
+          <button onClick={inviteMember}>Add</button>
+          <button onClick={() => setShowInviteModal(false)}>
+            Cancel
+          </button>
         </div>
       )}
     </div>

@@ -58,10 +58,8 @@ function Sidebar() {
                 </ul>
               </div>
             </div>
-
             <div className="child5">
               <h3>Settings</h3>
-
               <div className="child5-1">
                 <ul>
                   <li>⚙️ Settings</li>
@@ -69,7 +67,6 @@ function Sidebar() {
                 </ul>
               </div>
             </div>
-
             {/* Profile Section */}
             <div className="child6">
               {user.avatar ? (

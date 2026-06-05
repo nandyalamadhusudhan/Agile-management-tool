@@ -79,7 +79,6 @@ function Dashboard() {
       {/* Quick Actions */}
       <div className="section">
         <h2>Quick Actions</h2>
-
         <div className="quick-actions">
           <button>Create Workspace</button>
           <button>Create Board</button>

@@ -18,12 +18,11 @@ function Mainpage() {
         <div className="content-container">
           <Routes>
             <Route index element={<Dashboard />} />
-
             <Route
               path="workspace"
               element={<Workspace />}
             />
-
+            
             <Route
               path="teams"
               element={<Teams />}
