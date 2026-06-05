@@ -47,6 +47,10 @@ function Navbar({ setpage, setisloggedin }) {
           Chat
         </li>
 
+        <li onClick={() => setpage("Projects")}>
+          Projects
+        </li>
+
       </ul>
 
       <div className="right-section">
