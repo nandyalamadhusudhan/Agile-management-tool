@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "../register.css";
-function Register({ setpage }) {
+import { useNavigate } from "react-router-dom";
+function Register() {
+  const navigate=useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -29,7 +31,7 @@ function Register({ setpage }) {
       );
       alert(response.data.message);
       setTimeout(() => {
-        setpage("login");
+        navigate("/login");
       }, 1000);
 
     } catch (error) {
@@ -95,7 +97,7 @@ function Register({ setpage }) {
           Already have an account?
           <button
             type="button"
-            onClick={() => setPage("login")}
+            onClick={() => navigate("/login")}
           >
             Login
           </button>

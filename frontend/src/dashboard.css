@@ -1,29 +1,54 @@
 .dashboard {
-  padding: 20px;
-  background: #c8d3dd;
+  margin-left: 80px;
+  width: calc(100% - 80px);
   min-height: 100vh;
+  padding: 30px;
+  background: linear-gradient(
+    135deg,
+    #f8fafc,
+    #e2e8f0
+  );
+  transition: all 0.4s ease;
 }
 
-/* Welcome Card */
+/* If sidebar expanded */
+.dashboard-expanded {
+  margin-left: 280px;
+  width: calc(100% - 280px);
+}
+
+/* ===========================
+   WELCOME CARD
+=========================== */
 
 .welcome-card {
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
+  background: linear-gradient(
+    135deg,
+    #2563eb,
+    #0ea5e9
+  );
+
+  color: white;
+  padding: 30px;
+  border-radius: 20px;
+
   margin-bottom: 25px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+
+  box-shadow:
+    0 10px 30px rgba(37,99,235,0.25);
 }
 
 .welcome-card h1 {
-  color: #0f172a;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .welcome-card p {
-  color: #64748b;
+  opacity: 0.9;
 }
 
-/* Stats Cards */
+/* ===========================
+   STATS CARDS
+=========================== */
 
 .cards {
   display: flex;
@@ -33,25 +58,39 @@
 }
 
 .card {
-  width: 220px;
+  flex: 1;
+  min-width: 220px;
+
   background: white;
+
   padding: 25px;
-  border-radius: 12px;
+  border-radius: 18px;
+
   text-align: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,0.08);
+
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-8px);
 }
 
 .card h2 {
+  font-size: 36px;
   color: #2563eb;
-  font-size: 32px;
   margin-bottom: 10px;
 }
 
 .card p {
-  color: #475569;
+  color: #64748b;
 }
 
-/* Sections */
+/* ===========================
+   SECTION
+=========================== */
 
 .section {
   margin-bottom: 30px;
@@ -62,58 +101,81 @@
   color: #0f172a;
 }
 
-/* Quick Actions */
+/* ===========================
+   QUICK ACTIONS
+=========================== */
 
 .quick-actions {
   display: flex;
-  gap: 15px;
   flex-wrap: wrap;
+  gap: 15px;
 }
 
 .quick-actions button {
   border: none;
   background: #2563eb;
   color: white;
-  padding: 12px 18px;
-  border-radius: 8px;
+
+  padding: 12px 20px;
+  border-radius: 10px;
+
   cursor: pointer;
   transition: 0.3s;
 }
 
 .quick-actions button:hover {
   background: #1d4ed8;
+  transform: translateY(-3px);
 }
 
-/* Task Overview */
+/* ===========================
+   TASK OVERVIEW
+=========================== */
 
 .task-overview {
   display: flex;
-  gap: 20px;
   flex-wrap: wrap;
+  gap: 20px;
 }
 
 .status-card {
-  width: 220px;
+  flex: 1;
+  min-width: 220px;
+
   background: white;
-  padding: 20px;
-  border-radius: 12px;
+
+  padding: 25px;
+  border-radius: 18px;
+
   text-align: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,0.08);
+
+  transition: 0.3s;
+}
+
+.status-card:hover {
+  transform: translateY(-8px);
 }
 
 .status-card h3 {
-  font-size: 30px;
+  font-size: 36px;
   color: #0ea5e9;
   margin-bottom: 10px;
 }
 
-/* Recent Activity */
+/* ===========================
+   RECENT ACTIVITY
+=========================== */
 
 .activity-card {
   background: white;
   padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  border-radius: 18px;
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,0.08);
 }
 
 .activity-card h2 {
@@ -125,6 +187,31 @@
 }
 
 .activity-card li {
-  padding: 10px 0;
+  padding: 12px 0;
   border-bottom: 1px solid #e2e8f0;
+  color: #475569;
+}
+
+/* ===========================
+   MOBILE
+=========================== */
+
+@media (max-width: 768px) {
+  .sidebarcon.active {
+    width: 240px;
+  }
+
+  .dashboard {
+    padding: 15px;
+  }
+
+  .dashboard-expanded {
+    margin-left: 240px;
+    width: calc(100% - 240px);
+  }
+
+  .cards,
+  .task-overview {
+    flex-direction: column;
+  }
 }

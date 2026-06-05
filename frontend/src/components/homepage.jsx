@@ -1,12 +1,14 @@
 // Home.jsx
 import "../Home.css";
-function Home({setpage}) {
+import { useNavigate } from "react-router-dom";
+function Home() {
+  const navigate = useNavigate();
   return (
     <div className="container">
       {/* Navigation Bar */}
       <nav className="navbar">
         <h1 className="logo">AgileTool</h1>
-        <button className="login-btn" onClick={()=>setpage("login")}>Login</button>
+        <button className="login-btn" onClick={()=>navigate("/login")}>Login</button>
       </nav>
       <div className="content">
         <h1>Welcome to Agile Management Tool</h1>

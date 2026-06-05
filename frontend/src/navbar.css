@@ -1,107 +1,63 @@
-/* navbar.css */
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 .navbar {
-  height: 70px;
-  background-color: #0f172a;
-  color: white;
-
+  background: white;
   display: flex;
   align-items: center;
   justify-content: space-between;
 
   padding: 0 25px;
 
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-
-  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
-/* Search Box */
+
+.logo {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2563eb;
+}
 
 .search-box {
-  background-color: white;
-
-  width: 320px;
-  height: 42px;
-
   display: flex;
   align-items: center;
-
+  background: #f1f5f9;
+  padding: 8px 15px;
   border-radius: 8px;
-
-  padding: 0 12px;
-}
-
-.search-icon {
-  color: gray;
-  font-size: 15px;
+  width: 350px;
 }
 
 .search-box input {
-  width: 100%;
   border: none;
   outline: none;
-
+  background: transparent;
   margin-left: 10px;
-  font-size: 15px;
+  width: 100%;
 }
-
-/* Nav Links */
 
 .nav-links {
   display: flex;
   gap: 25px;
-
   list-style: none;
 }
 
 .nav-links li {
   cursor: pointer;
-  transition: 0.3s;
+  font-weight: 500;
 }
 
 .nav-links li:hover {
-  color: #38bdf8;
+  color: #2563eb;
 }
-
-/* Right Section */
 
 .right-section {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 15px;
 }
 
 .video-btn {
-  background-color: #0ea5e9;
-  color: white;
-
+  padding: 10px 18px;
   border: none;
-  padding: 10px 16px;
-
   border-radius: 8px;
-
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  cursor: pointer;
-}
-
-.nav-icon {
-  font-size: 20px;
-  cursor: pointer;
-}
-
-.profile-icon {
-  font-size: 32px;
+  background: #ef4444;
+  color: white;
   cursor: pointer;
 }

@@ -217,6 +217,56 @@ app.get("/workspace/all", authMiddleware, async (req, res) => {
     });
   }
 });
+app.post("/workspace/invite", authMiddleware, async (req, res) => {
+  try {
+    const { workspaceId, email } = req.body;
+    if (!workspaceId || !email) {
+      return res.status(400).json({
+        message: "Workspace ID and Email are required",
+      });
+    }
+
+    const workspace = await Workspace.findById(workspaceId);
+
+    if (!workspace) {
+      return res.status(404).json({
+        message: "Workspace not found",
+      });
+    }
+
+    // OPTIONAL: only owner can add members
+    if (workspace.owner.toString() !== req.user.id) {
+      return res.status(403).json({
+        message: "Only workspace owner can add members",
+      });
+    }
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    if (workspace.members.includes(user._id)) {
+      return res.status(400).json({
+        message: "User already a member",
+      });
+    }
+
+    workspace.members.push(user._id);
+    await workspace.save();
+
+    res.status(200).json({
+      message: "Member added successfully",
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+});
 // Start Server
 app.listen(5000, () => {
   console.log("Server running on port 5000");

@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 const ListSchema = new mongoose.Schema(
 {
   title: {
@@ -12,7 +11,6 @@ const ListSchema = new mongoose.Schema(
     ref: "Board",
     required: true
   },
-
   position: {
     type: Number,
     default: 0
@@ -21,5 +19,4 @@ const ListSchema = new mongoose.Schema(
 {
   timestamps: true
 });
-
 module.exports = mongoose.model("List", ListSchema);

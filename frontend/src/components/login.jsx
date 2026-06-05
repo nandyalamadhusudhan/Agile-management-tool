@@ -2,13 +2,11 @@
 import { useState } from "react";
 import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-
+import { useNavigate } from "react-router-dom";
 import "../login.css";
-
-function Login({ setpage,setisloggedin }) {
-
+function Login() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -37,7 +35,7 @@ function Login({ setpage,setisloggedin }) {
       );
       alert(response.data.message);
       console.log(response.data.token);
-      setisloggedin(true);
+      navigate("/mainpage");
     } catch (error) {
       console.log(error);
       alert(
@@ -102,7 +100,7 @@ function Login({ setpage,setisloggedin }) {
           Don't have an account?
           <span
             className="switch-link"
-            onClick={() => setpage("register")}
+            onClick={() => navigate("/register")}
           >
             Register
           </span>

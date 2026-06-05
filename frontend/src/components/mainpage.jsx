@@ -1,42 +1,42 @@
-import { useState } from "react";
-import Navbar from "../components/navbar";
-import Sidebar from "../components/sidebar";
-import Dashboard from "../components/dashboard";
-import Workspace from "../components/workspace";
+import { Routes, Route } from "react-router-dom";
+import Navbar from "./navbar";
+import Sidebar from "./sidebar";
+import Dashboard from "./dashboard";
+import Workspace from "./workspace";
+import Teams from "./teams";
+import Chat from "./chat";
 import "../mainpage.css";
 
-function Mainpage({ setisloggedin }) {
-  const [page, setpage] = useState("dashboard");
-
+function Mainpage() {
   return (
-    <>
-      <Navbar
-        setpage={setpage}
-        setisloggedin={setisloggedin}
-      />
+    <div className="mainpage">
+      <Navbar />
 
-      <Sidebar />
+      <div className="body-container">
+        <Sidebar />
 
-      <div className="page-content">
+        <div className="content-container">
+          <Routes>
+            <Route index element={<Dashboard />} />
 
-        {page === "dashboard" && (
-          <Dashboard />
-        )}
+            <Route
+              path="workspace"
+              element={<Workspace />}
+            />
 
-        {page === "workspace" && (
-          <Workspace />
-        )}
+            <Route
+              path="teams"
+              element={<Teams />}
+            />
 
-        {page === "teams" && (
-          <h1>Teams Page</h1>
-        )}
-
-        {page === "chat" && (
-          <h1>Chat Page</h1>
-        )}
-
+            <Route
+              path="chat"
+              element={<Chat />}
+            />
+          </Routes>
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 

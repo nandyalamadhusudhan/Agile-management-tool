@@ -2,20 +2,16 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import "../dashboard.css";
-
 function Dashboard() {
   const [username, setUsername] = useState("");
-
   const [stats, setStats] = useState({
     workspaces: 0,
     boards: 0,
     users: 0,
     cards: 0
   });
-
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     if (token) {
       const decoded = jwtDecode(token);
       setUsername(decoded.name);

@@ -1,21 +1,16 @@
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import "../sidebar.css";
-
 function Sidebar() {
   const [open, setOpen] = useState(false);
-
   const [user, setUser] = useState({
     name: "Profile",
     avatar: ""
   });
-
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     if (token) {
       const decoded = jwtDecode(token);
-
       setUser({
         name: decoded.name || "Profile",
         avatar: decoded.avatar || ""
@@ -25,9 +20,7 @@ function Sidebar() {
 
   return (
     <div className="maincontainer">
-
       <div className={open ? "sidebarcon active" : "sidebarcon"}>
-
         <div className="child1">
           <button onClick={() => setOpen(!open)}>
             ☰
@@ -42,17 +35,15 @@ function Sidebar() {
             <div className="child2">
               <h2>Dashboard</h2>
             </div>
-
             <div className="child3">
               <h3>Workspace</h3>
-
               <div className="child3-1">
                 <ul>
-                  <li>Projects</li>
-                  <li>Tasks</li>
-                  <li>Calendar</li>
-                  <li>Files</li>
-                  <li>Team Members</li>
+                  <li>📁 Projects</li>
+                  <li>✅ Tasks</li>
+                  <li>📅 Calendar</li>
+                  <li>📂 Files</li>
+                  <li>👥 Team Members</li>
                 </ul>
               </div>
             </div>
@@ -62,8 +53,8 @@ function Sidebar() {
 
               <div className="child4-1">
                 <ul>
-                  <li>Chat</li>
-                  <li>Channels</li>
+                  <li>💬 Chat</li>
+                  <li>📞Meeting</li>
                 </ul>
               </div>
             </div>
@@ -73,8 +64,8 @@ function Sidebar() {
 
               <div className="child5-1">
                 <ul>
-                  <li>Settings</li>
-                  <li>Help & Support</li>
+                  <li>⚙️ Settings</li>
+                  <li>❓ Help & Support</li>
                 </ul>
               </div>
             </div>
