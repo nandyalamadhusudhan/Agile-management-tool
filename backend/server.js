@@ -175,30 +175,28 @@ app.get("/workspace/all", authMiddleware, async (req, res) => {
 app.post("/workspace/invite", authMiddleware, async (req, res) => {
   try {
     const { workspaceId, email } = req.body;
-
     const workspace = await Workspace.findById(workspaceId);
-
     if (!workspace) {
       return res.status(404).json({ message: "Workspace not found" });
     }
-
     if (workspace.owner.toString() !== req.user.id) {
       return res.status(403).json({ message: "Only owner can add members" });
     }
-
     const user = await User.findOne({ email });
-
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+    const alreadyMember = workspace.members.some(
+     member => member.toString() === user._id.toString()
+   );
 
-    if (workspace.members.includes(user._id)) {
-      return res.status(400).json({ message: "Already a member" });
-    }
-
+if (alreadyMember) {
+  return res.status(400).json({
+    message: "Already a member"
+  });
+}
     workspace.members.push(user._id);
     await workspace.save();
-
     res.json({ message: "Member added successfully" });
   } catch (err) {
     res.status(500).json({ message: err.message });
