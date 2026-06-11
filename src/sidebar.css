@@ -1,0 +1,224 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.maincontainer {
+  display: flex;
+}
+
+/* ===========================
+   SIDEBAR
+=========================== */
+
+.sidebarcon {
+  position: fixed;
+  left: 0;
+  top: 70px;
+  width: 105px;
+  height: calc(100vh - 70px);
+  overflow: hidden;
+  transition: all 0.4s ease;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+
+  background: linear-gradient(
+    135deg,
+    #f8fafc,
+    #e2e8f0
+  );
+}
+
+.sidebarcon.active {
+  width: 260px;
+  background: linear-gradient(
+    180deg,
+    #0f172a,
+    #1e293b
+  );
+}
+
+/* ===========================
+   HEADER
+=========================== */
+
+.child1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 15px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.child1 button {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background-color:blue;
+  color: white;
+  font-size: 18px;
+  transition: all 0.3s ease;
+}
+
+.child1 h1 {
+  font-size: 18px;
+  color: #38bdf8;
+  white-space: nowrap;
+}
+
+/* ===========================
+   SECTIONS
+=========================== */
+
+.child2,
+.child3,
+.child4,
+.child5 {
+  padding: 6px 14px;
+}
+
+.child2 h2,
+.child3 h3,
+.child4 h3,
+.child5 h3 {
+  color: #94a3b8;
+  font-size: 11px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.child2 h2 {
+  background: linear-gradient(
+    90deg,
+    #0ea5e9,
+    #38bdf8
+  );
+
+  padding: 10px;
+  border-radius: 10px;
+  color: white;
+  text-align: center;
+}
+
+/* ===========================
+   MENU LIST
+=========================== */
+
+.child3 ul,
+.child4 ul,
+.child5 ul {
+  list-style: none;
+}
+
+.child3 li,
+.child4 li,
+.child5 li {
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-bottom: 2px;
+  cursor: pointer;
+
+  color: #e2e8f0;
+  font-size: 14px;
+
+  transition: all 0.3s ease;
+}
+
+.child3 li:hover,
+.child4 li:hover,
+.child5 li:hover {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  transform: translateX(6px);
+}
+
+/* ===========================
+   PROFILE
+=========================== */
+
+.child6 {
+  position: absolute;
+  bottom: 12px;
+  left: 10px;
+  right: 10px;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px;
+
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+
+  border-radius: 12px;
+}
+
+.avatar,
+.probtn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+}
+
+.avatar {
+  object-fit: cover;
+}
+
+.probtn {
+  border: none;
+  background: linear-gradient(
+    #38bdf8,
+    #0ea5e9
+  );
+
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.child6-1 h3 {
+  color: white;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.child6-1 p {
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+/* ===========================
+   SCROLLBAR
+=========================== */
+
+.sidebarcon::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebarcon::-webkit-scrollbar-thumb {
+  background: #38bdf8;
+  border-radius: 10px;
+}
+
+/* ===========================
+   MOBILE
+=========================== */
+
+@media (max-width: 768px) {
+  .sidebarcon.active {
+    width: 230px;
+  }
+
+  .child1 h1 {
+    font-size: 16px;
+  }
+
+  .child6 {
+    padding: 8px;
+  }
+}
