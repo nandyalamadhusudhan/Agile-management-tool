@@ -1,0 +1,185 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+.workspace-container {
+  padding: 25px;
+  margin-left: 105px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+}
+
+.workspace-container h1 {
+  color: #0f172a;
+  margin-bottom: 20px;
+}
+
+.workspace-summary {
+  background: white;
+  padding: 18px 22px;
+  border-radius: 16px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+
+  margin-bottom: 25px;
+}
+
+.workspace-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.workspace-card {
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.workspace-card:hover {
+  transform: translateY(-4px);
+}
+
+.workspace-card h3 {
+  color: #2563eb;
+  margin-bottom: 8px;
+}
+
+.workspace-card p {
+  color: #64748b;
+  margin-bottom: 12px;
+}
+
+.create-btn {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  border: none;
+
+  padding: 12px 18px;
+  border-radius: 10px;
+
+  cursor: pointer;
+  font-weight: 600;
+
+  transition: 0.3s;
+}
+
+.create-btn:hover {
+  transform: translateY(-2px);
+}
+
+.member-btn {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  color: white;
+  border: none;
+
+  padding: 10px 15px;
+  border-radius: 10px;
+
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+
+  padding: 12px 18px;
+  border-radius: 10px;
+
+  cursor: pointer;
+}
+
+.cancel-btn:hover {
+  background: #dc2626;
+}
+
+/* Overlay */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(5px);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 9999;
+}
+
+/* Modal */
+
+.modal {
+  background: white;
+
+  width: 380px;
+  max-width: 90%;
+
+  padding: 25px;
+
+  border-radius: 18px;
+
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+
+  animation: popup 0.25s ease;
+}
+
+@keyframes popup {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal h2 {
+  text-align: center;
+  margin-bottom: 18px;
+  color: #0f172a;
+}
+
+.modal input {
+  width: 100%;
+
+  padding: 12px;
+
+  margin-bottom: 12px;
+
+  border: 1px solid #dbe2ea;
+  border-radius: 10px;
+
+  font-size: 14px;
+}
+
+.modal input:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.modal-buttons button {
+  flex: 1;
+}

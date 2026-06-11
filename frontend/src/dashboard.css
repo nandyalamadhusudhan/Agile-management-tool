@@ -1,0 +1,217 @@
+.dashboard {
+  margin-left: 80px;
+  width: calc(100% - 80px);
+  min-height: 100vh;
+  padding: 30px;
+  background: linear-gradient(
+    135deg,
+    #f8fafc,
+    #e2e8f0
+  );
+  transition: all 0.4s ease;
+}
+
+/* If sidebar expanded */
+.dashboard-expanded {
+  margin-left: 280px;
+  width: calc(100% - 280px);
+}
+
+/* ===========================
+   WELCOME CARD
+=========================== */
+
+.welcome-card {
+  background: linear-gradient(
+    135deg,
+    #2563eb,
+    #0ea5e9
+  );
+
+  color: white;
+  padding: 30px;
+  border-radius: 20px;
+
+  margin-bottom: 25px;
+
+  box-shadow:
+    0 10px 30px rgba(37,99,235,0.25);
+}
+
+.welcome-card h1 {
+  margin-bottom: 10px;
+}
+
+.welcome-card p {
+  opacity: 0.9;
+}
+
+/* ===========================
+   STATS CARDS
+=========================== */
+
+.cards {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.card {
+  flex: 1;
+  min-width: 220px;
+
+  background: white;
+
+  padding: 25px;
+  border-radius: 18px;
+
+  text-align: center;
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,0.08);
+
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+}
+
+.card h2 {
+  font-size: 36px;
+  color: #2563eb;
+  margin-bottom: 10px;
+}
+
+.card p {
+  color: #64748b;
+}
+
+/* ===========================
+   SECTION
+=========================== */
+
+.section {
+  margin-bottom: 30px;
+}
+
+.section h2 {
+  margin-bottom: 15px;
+  color: #0f172a;
+}
+
+/* ===========================
+   QUICK ACTIONS
+=========================== */
+
+.quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.quick-actions button {
+  border: none;
+  background: #2563eb;
+  color: white;
+
+  padding: 12px 20px;
+  border-radius: 10px;
+
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.quick-actions button:hover {
+  background: #1d4ed8;
+  transform: translateY(-3px);
+}
+
+/* ===========================
+   TASK OVERVIEW
+=========================== */
+
+.task-overview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.status-card {
+  flex: 1;
+  min-width: 220px;
+
+  background: white;
+
+  padding: 25px;
+  border-radius: 18px;
+
+  text-align: center;
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,0.08);
+
+  transition: 0.3s;
+}
+
+.status-card:hover {
+  transform: translateY(-8px);
+}
+
+.status-card h3 {
+  font-size: 36px;
+  color: #0ea5e9;
+  margin-bottom: 10px;
+}
+
+/* ===========================
+   RECENT ACTIVITY
+=========================== */
+
+.activity-card {
+  background: white;
+  padding: 25px;
+  border-radius: 18px;
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,0.08);
+}
+
+.activity-card h2 {
+  margin-bottom: 15px;
+}
+
+.activity-card ul {
+  list-style: none;
+}
+
+.activity-card li {
+  padding: 12px 0;
+  border-bottom: 1px solid #e2e8f0;
+  color: #475569;
+}
+
+/* ===========================
+   MOBILE
+=========================== */
+
+@media (max-width: 768px) {
+  .sidebarcon.active {
+    width: 240px;
+  }
+
+  .dashboard {
+    padding: 15px;
+  }
+
+  .dashboard-expanded {
+    margin-left: 240px;
+    width: calc(100% - 240px);
+  }
+
+  .cards,
+  .task-overview {
+    flex-direction: column;
+  }
+}
