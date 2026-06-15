@@ -4,6 +4,7 @@ import Login from "./components/login";
 import Register from "./components/register";
 import Mainpage from "./components/mainpage";
 import Board from "./components/board";
+import Chat from "./components/chat";
 function App() {
   const token = localStorage.getItem("token");
   return (
@@ -12,6 +13,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/workspace/:id" element={<Board />} />
+      <Route path="/chat/:workspaceId" element={<Chat />} />
       <Route
         path="/mainpage/*"
         element={

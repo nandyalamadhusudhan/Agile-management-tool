@@ -138,25 +138,15 @@ function Workspace() {
       state: {
         workspaceId: workspace._id,
         workspaceName: workspace.name,
-        workspaceDescription: workspace.description,
       },
     });
   };
+
   return (
     <div className="workspace-container">
       <h1>Workspace Dashboard</h1>
-<<<<<<< HEAD
-
       <div className="workspace-summary">
         <h3>Total Workspaces: {workspaceCount}</h3>
-
-=======
-      <div className="workspace-header">
-        <div className="workspace-count-card">
-          <h3>Total Workspaces</h3>
-          <span>{workspaceCount}</span>
-        </div>
->>>>>>> 3c15116ffdd33d3421cfaaff489bb1318ec5a102
         <button
   className="create-btn"
   onClick={() => setShowModal(true)}
@@ -164,8 +154,8 @@ function Workspace() {
   + Create Workspace
 </button>
       </div>
+
       <div className="workspace-list">
-<<<<<<< HEAD
         {workspaces.map((workspace) => (
           <div
             key={workspace._id}
@@ -188,51 +178,22 @@ function Workspace() {
       </div>
 
       {/* CREATE MODAL */}
-=======
-        {workspaces.length === 0 ? (
-          <p>No workspaces found.</p>
-        ) : (
-          workspaces.map((workspace) => (
-            <div
-              key={workspace._id}
-              className="workspace-card"
-            >
-              <h3>{workspace.name}</h3>
-              <p>
-                <strong>Description:</strong>{" "}
-                {workspace.description ||
-                  "No Description"}
-              </p>
-              <p>
-                <strong>Created At:</strong>{" "}
-                {new Date(
-                  workspace.createdAt
-                ).toLocaleDateString()}
-              </p>
-            </div>
-          ))
-        )}
-      </div>
->>>>>>> 3c15116ffdd33d3421cfaaff489bb1318ec5a102
       {showModal && (
   <div className="modal-overlay">
     <div className="modal">
       <h2>Create Workspace</h2>
-
       <input
         name="workspaceName"
         value={workspaceData.workspaceName}
         onChange={handleChange}
         placeholder="Workspace Name"
       />
-
       <input
         name="description"
         value={workspaceData.description}
         onChange={handleChange}
         placeholder="Description"
       />
-
       <div className="modal-buttons">
         <button
           className="create-btn"
@@ -240,7 +201,6 @@ function Workspace() {
         >
           Create
         </button>
-
         <button
           className="cancel-btn"
           onClick={() => setShowModal(false)}
@@ -255,30 +215,12 @@ function Workspace() {
         {/* INVITE MODAL */}
       {showInviteModal && (
         <div className="modal-overlay">
-<<<<<<< HEAD
           <div className="modal">
             <h2>Add Member</h2>
-
             <input
               value={memberEmail}
               onChange={(e) => setMemberEmail(e.target.value)}
               placeholder="Enter member email"
-=======
-          <div className="modal-box">
-            <h2>Create Workspace</h2>
-            <input
-              type="text"
-              name="workspaceName"
-              placeholder="Workspace Name"
-              value={workspaceData.workspaceName}
-              onChange={handleChange}
-            />
-            <textarea
-              name="description"
-              placeholder="Description"
-              value={workspaceData.description}
-              onChange={handleChange}
->>>>>>> 3c15116ffdd33d3421cfaaff489bb1318ec5a102
             />
             <div className="modal-buttons">
               <button

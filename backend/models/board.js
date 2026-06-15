@@ -1,14 +1,17 @@
 const mongoose = require("mongoose");
+
 const BoardSchema = new mongoose.Schema(
 {
   title: {
     type: String,
     required: true
   },
+
   description: {
     type: String,
     default: ""
   },
+
   workspace: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Workspace",
@@ -19,7 +22,14 @@ const BoardSchema = new mongoose.Schema(
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true
-  }
+  },
+
+  cards: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "card"
+    }
+  ]
 },
 {
   timestamps: true
