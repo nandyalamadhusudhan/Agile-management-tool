@@ -25,15 +25,13 @@ function Board() {
     console.error("Workspace ID missing");
     return;
   }
-  navigate(`/chat/${workspaceId}`);
+  navigate(`/mainpage/chat/${workspaceId}`);
   };
   useEffect(() => {
   if (!workspaceId) return;
-
   fetchBoards();
   fetchMembers();
 }, [workspaceId]);
-
   const fetchBoards = async () => {
     try {
       const token=localStorage.getItem("token");
@@ -153,6 +151,14 @@ setBoards(res.data);
 };
   return (
     <div className="board-container">
+      <div className="board-top">
+  <button
+    className="back-btn"
+    onClick={() => navigate(-1)}
+  >
+    ← Back
+  </button>
+</div>
       <div className="board-header">
         <h2>WORKSPACE NAME:{workspaceName || "Workspace Board"}</h2>
         <p>{workspaceDescription}</p>

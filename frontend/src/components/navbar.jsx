@@ -33,9 +33,7 @@ function Navbar() {
         <li onClick={() => navigate("/mainpage/teams")}>
           Teams
         </li>
-        <li onClick={() => navigate("/mainpage/chat")}>
-          Chat
-        </li>
+
       </ul>
       <div className="right-section">
         <FaBell className="nav-icon" />

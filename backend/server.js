@@ -9,10 +9,15 @@ const User = require("./models/user");
 const Workspace = require("./models/workspace");
 const Board = require("./models/board");
 const Card = require("./models/card");
+const Message= require("./models/message");
 const app = express();
 const server=http.createServer(app);
 const { Server }=require("socket.io");
 const secretKey = "venkatalakshmi1";
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
 const io=new Server(server,{
   cors:{
     origin:"*",
@@ -21,47 +26,51 @@ const io=new Server(server,{
 })
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
-  // Join workspace room
+
   socket.on("joinWorkspace", ({ workspaceId, token }) => {
-  if (!token) {
-    console.log("Token not received");
-    return;
-  }
+    try {
+      const payload = jwt.verify(token, secretKey);
 
-  try {
-    const payload = jwt.verify(token, secretKey);
+      socket.username = payload.name;
 
-    socket.username = payload.name;
+      socket.join(workspaceId);
 
-    socket.join(workspaceId);
-
-    console.log(
-      `${socket.username} joined workspace ${workspaceId}`
-    );
-  } catch (err) {
-    console.log("Invalid token:", err.message);
-  }
-});
-
-  // Send message to workspace members only
-  socket.on("sendMessage", ({ workspaceId, text }) => {
-    const message = {
-      sender: socket.username,
-      text,
-      timestamp: new Date(),
-    };
-    io.to(workspaceId).emit("receiveMessage", message);
+      console.log(
+        `${socket.username} joined workspace ${workspaceId}`
+      );
+    } catch (err) {
+      console.log(err);
+    }
   });
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
-  });
-});
 
+  socket.on(
+    "sendMessage",
+    async ({ workspaceId, text }) => {
+      const message = await Message.create({
+        workspaceId,
+        sender: socket.username,
+        text,
+        timestamp: new Date(),
+      });
+
+      io.to(workspaceId).emit(
+        "receiveMessage",
+        message
+      );
+    }
+  );
+});
+app.get(
+  "/workspace/:workspaceId/messages",
+  async (req, res) => {
+    const messages = await Message.find({
+      workspaceId: req.params.workspaceId,
+    }).sort({ timestamp: 1 });
+
+    res.json(messages);
+  }
+);
 // ---------------- MIDDLEWARE ----------------
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
 
 // ---------------- DB CONNECTION ----------------
 mongoose
@@ -154,13 +163,70 @@ app.post("/login", async (req, res) => {
 // ---------------- DASHBOARD ----------------
 app.get("/dashboard", authMiddleware, async (req, res) => {
   try {
-    const workspaces = await Workspace.countDocuments();
-    const boards = await Board.countDocuments();
-    const users = await User.countDocuments();
-    const cards = await Card.countDocuments();
-    res.json({ workspaces, boards, users, cards });
+    // User workspaces
+    const userWorkspaces = await Workspace.find({
+      members: req.user.id,
+    });
+
+    const workspaceIds = userWorkspaces.map(
+      (workspace) => workspace._id
+    );
+
+    // Boards in user's workspaces
+    const boards = await Board.find({
+      workspace: { $in: workspaceIds },
+    });
+
+    const boardIds = boards.map(
+      (board) => board._id
+    );
+
+    // Tasks assigned to logged-in user
+    const cards = await Card.countDocuments({
+  board: { $in: boardIds },
+  assignedTo: req.user.id,
+});
+    // Task status counts
+    const pending = await Card.countDocuments({
+      board: { $in: boardIds },
+      assignedTo: req.user.id,
+      listName: "Todo",
+    });
+
+    const inProgress = await Card.countDocuments({
+      board: { $in: boardIds },
+      assignedTo: req.user.id,
+      listName: "In Progress",
+    });
+
+    const completed = await Card.countDocuments({
+      board: { $in: boardIds },
+      assignedTo: req.user.id,
+      listName: "Done",
+    });
+
+    // Unique team members
+    const memberIds = new Set();
+
+    userWorkspaces.forEach((workspace) => {
+      workspace.members.forEach((memberId) => {
+        memberIds.add(memberId.toString());
+      });
+    });
+
+    res.json({
+      workspaces: userWorkspaces.length,
+      boards: boards.length,
+      users: memberIds.size,
+      cards,
+      pending,
+      inProgress,
+      completed,
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      message: err.message,
+    });
   }
 });
 // ---------------- WORKSPACE ROUTES ----------------
@@ -197,7 +263,10 @@ app.get("/workspace/count", authMiddleware, async (req, res) => {
 // GET ALL WORKSPACES
 app.get("/workspace/all", authMiddleware, async (req, res) => {
   try {
-    const workspaces = await Workspace.find().sort({ createdAt: -1 });
+    const workspaces = await Workspace.find({
+      members: req.user.id
+    }).sort({ createdAt: -1 });
+
     res.json(workspaces);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -320,20 +389,6 @@ app.delete("/boards/:id", authMiddleware, async (req, res) => {
     });
   }
 });
-app.get("/workspace/:id/members", authMiddleware, async (req, res) => {
-  try {
-    const workspace = await Workspace.findById(req.params.id)
-      .populate("members", "name email");
-
-    if (!workspace) {
-      return res.status(404).json({ message: "Workspace not found" });
-    }
-
-    res.json(workspace.members);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
 app.post("/cards",authMiddleware, async (req, res) => {
   try {
     const {
@@ -367,6 +422,22 @@ app.post("/cards",authMiddleware, async (req, res) => {
     res.status(500).json({
       message: "Failed to create task",
     });
+  }
+});
+app.get("/api/workspaces/myteams", authMiddleware, async (req, res) => {
+  try {
+    const workspaces = await Workspace.find({
+      $or: [
+        { owner: req.user.id },
+        { members: req.user.id }
+      ]
+    })
+      .populate("members", "name email")
+      .populate("owner", "name email");
+
+    res.json(workspaces);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 // ---------------- START SERVER ----------------

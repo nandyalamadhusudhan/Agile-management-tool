@@ -2,51 +2,54 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {socket} from "../socket";
 import "../chat.css";
-
+import axios from "axios";
 function Chat() {
   const { workspaceId } = useParams();
   const navigate = useNavigate();
-
   const token = localStorage.getItem("token");
-
   const payload = JSON.parse(
     atob(token.split(".")[1])
   );
-
   const username = payload.name;
-
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-
   useEffect(() => {
-    socket.connect();
-    socket.emit("joinWorkspace", {
-      workspaceId,
-      token,
-    });
+  const fetchMessages = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/workspace/${workspaceId}/messages`
+      );
 
-    console.log(`${username} joined workspace ${workspaceId}`);
-
-    socket.on("receiveMessage", (msg) => {
-      setMessages((prev) => [...prev, msg]);
-    });
-
-    return () => {
-      socket.off("receiveMessage");
-    };
-  }, [workspaceId, token]);
-
-  const sendMessage = () => {
-    if (!message.trim()) return;
-
-    socket.emit("sendMessage", {
-      workspaceId,
-      text: message,
-    });
-
-    setMessage("");
+      setMessages(res.data);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
+  fetchMessages();
+  socket.connect();
+  socket.emit("joinWorkspace", {
+    workspaceId,
+    token,
+  });
+  socket.on("receiveMessage", (msg) => {
+    setMessages((prev) => [...prev, msg]);
+  });
+
+  return () => {
+    socket.off("receiveMessage");
+  };
+}, [workspaceId]);
+const sendMessage = () => {
+  if (!message.trim()) return;
+
+  socket.emit("sendMessage", {
+    workspaceId,
+    text: message,
+  });
+
+  setMessage("");
+};
   return (
     <div className="chat-container slide-in">
       <div className="chat-header">
@@ -56,12 +59,9 @@ function Chat() {
         >
           ← Back
         </button>
-
         <h2>Workspace Chat</h2>
-
         <span>{username}</span>
       </div>
-
       <div className="chat-body">
         {messages.length === 0 ? (
           <div className="empty-chat">
@@ -87,11 +87,9 @@ function Chat() {
                 <div className="sender">
                   {msg.sender}
                 </div>
-
                 <div className="text">
                   {msg.text}
                 </div>
-
                 <div className="time">
                   {new Date(
                     msg.timestamp
@@ -102,7 +100,6 @@ function Chat() {
           ))
         )}
       </div>
-
       <div className="chat-footer">
         <input
           type="text"
@@ -117,7 +114,6 @@ function Chat() {
             }
           }}
         />
-
         <button
           className="send-btn"
           onClick={sendMessage}

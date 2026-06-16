@@ -30,39 +30,31 @@
 
   margin-bottom: 25px;
 }
-
 .workspace-list {
   display: flex;
   flex-direction: column;
   gap: 18px;
   text-transform: uppercase;
 }
-
 .workspace-card {
   background: white;
   padding: 20px;
   border-radius: 16px;
-
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-
   cursor: pointer;
   transition: 0.3s;
 }
-
 .workspace-card:hover {
   transform: translateY(-4px);
 }
-
 .workspace-card h3 {
   color: #2563eb;
   margin-bottom: 8px;
 }
-
 .workspace-card p {
   color: #64748b;
   margin-bottom: 12px;
 }
-
 .create-btn {
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: white;

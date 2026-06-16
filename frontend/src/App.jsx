@@ -5,6 +5,9 @@ import Register from "./components/register";
 import Mainpage from "./components/mainpage";
 import Board from "./components/board";
 import Chat from "./components/chat";
+import Team from "./components/teams";
+import Dashboard from "./components/dashboard";
+import Workspace from "./components/workspace";
 function App() {
   const token = localStorage.getItem("token");
   return (
@@ -12,8 +15,7 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/workspace/:id" element={<Board />} />
-      <Route path="/chat/:workspaceId" element={<Chat />} />
+      {/* Protected Main Layout */}
       <Route
         path="/mainpage/*"
         element={
@@ -23,6 +25,24 @@ function App() {
             <Navigate to="/login" />
           )
         }
+      >
+        <Route index element={<Dashboard />} />
+        <Route
+          path="workspace"
+          element={<Workspace />}
+        />
+        <Route
+          path="teams"
+          element={<Team />}
+        />
+        <Route
+          path="chat/:workspaceId"
+          element={<Chat />}
+        />
+      </Route>
+      <Route
+        path="/workspace/:id"
+        element={<Board />}
       />
     </Routes>
   );

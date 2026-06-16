@@ -5,18 +5,20 @@ import "../dashboard.css";
 function Dashboard() {
   const [username, setUsername] = useState("");
   const [stats, setStats] = useState({
-    workspaces: 0,
-    boards: 0,
-    users: 0,
-    cards: 0
-  });
+  workspaces: 0,
+  boards: 0,
+  users: 0,
+  cards: 0,
+  pending: 0,
+  inProgress: 0,
+  completed: 0
+});
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       const decoded = jwtDecode(token);
       setUsername(decoded.name);
     }
-
     fetchStats();
   }, []);
 
@@ -32,7 +34,6 @@ function Dashboard() {
           }
         }
       );
-
       setStats(res.data);
 
     } catch (error) {
@@ -42,7 +43,6 @@ function Dashboard() {
 
   return (
     <div className="dashboard">
-
       {/* Welcome */}
       <div className="welcome-card">
         <h1>Hello, {username} 👋</h1>
@@ -68,7 +68,6 @@ function Dashboard() {
           <h2>{stats.users}</h2>
           <p>Team Members</p>
         </div>
-
         <div className="card">
           <h2>{stats.cards}</h2>
           <p>Tasks</p>
@@ -89,32 +88,28 @@ function Dashboard() {
 
       {/* Task Overview */}
       <div className="section">
-        <h2>Task Overview</h2>
+  <h2>Task Overview</h2>
 
-        <div className="task-overview">
+  <div className="task-overview">
+    <div className="status-card">
+      <h3>{stats.pending}</h3>
+      <p>Pending</p>
+    </div>
 
-          <div className="status-card">
-            <h3>12</h3>
-            <p>Pending</p>
-          </div>
+    <div className="status-card">
+      <h3>{stats.inProgress}</h3>
+      <p>In Progress</p>
+    </div>
 
-          <div className="status-card">
-            <h3>8</h3>
-            <p>In Progress</p>
-          </div>
-
-          <div className="status-card">
-            <h3>25</h3>
-            <p>Completed</p>
-          </div>
-
-        </div>
-      </div>
-
+    <div className="status-card">
+      <h3>{stats.completed}</h3>
+      <p>Completed</p>
+    </div>
+  </div>
+</div>
       {/* Recent Activity */}
       <div className="activity-card">
         <h2>Recent Activity</h2>
-
         <ul>
           <li>✅ New task created</li>
           <li>📁 Workspace updated</li>
@@ -126,5 +121,4 @@ function Dashboard() {
     </div>
   );
 }
-
 export default Dashboard;

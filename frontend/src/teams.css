@@ -1,4 +1,354 @@
-.h1{
-    color: #333;
-    margin-bottom: 20px;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+/* =========================
+   TEAM PAGE
+========================= */
+
+.team-page {
+
+  min-height: calc(100vh - 70px);
+
+  background:#f4f7fc;
+
+  padding:30px;
+
+  margin-left:105px;
+
+  margin-top:70px;
+
+  width:calc(100% - 105px);
+
+  transition:.3s ease;
+
+}
+
+
+/* =========================
+   TITLE
+========================= */
+
+.team-page h1 {
+
+  text-align:center;
+
+  margin-bottom:35px;
+
+  color:#1f2937;
+
+  font-size:2rem;
+
+  font-weight:700;
+
+}
+
+
+
+/* =========================
+ WORKSPACE CARD
+========================= */
+
+
+.workspace-card {
+
+  background:white;
+
+  border-radius:18px;
+
+  padding:25px;
+
+  margin-bottom:25px;
+
+  box-shadow:
+  0 4px 15px rgba(0,0,0,.08);
+
+  transition:.3s;
+
+}
+
+
+
+.workspace-card:hover {
+
+  transform:translateY(-5px);
+
+  box-shadow:
+  0 10px 25px rgba(0,0,0,.12);
+
+}
+
+
+
+/* =========================
+ HEADER
+========================= */
+
+
+.workspace-header {
+
+  border-bottom:1px solid #e5e7eb;
+
+  padding-bottom:15px;
+
+  margin-bottom:20px;
+
+}
+
+
+.workspace-header h2 {
+
+  color:#2563eb;
+
+  font-size:1.5rem;
+
+  margin-bottom:8px;
+
+}
+
+
+.workspace-header p {
+
+  color:#6b7280;
+
+  line-height:1.6;
+
+  overflow-wrap:anywhere;
+
+}
+
+
+
+/* =========================
+ MEMBERS
+========================= */
+
+
+.members-title {
+
+ margin-bottom:15px;
+
+ color:#111827;
+
+ font-size:1.1rem;
+
+ font-weight:600;
+
+}
+
+
+
+.members-grid {
+
+ display:grid;
+
+ grid-template-columns:
+ repeat(auto-fit,minmax(230px,1fr));
+
+ gap:20px;
+
+}
+
+
+
+/* =========================
+ MEMBER CARD
+========================= */
+
+
+.member-card {
+
+ background:#f9fafb;
+
+ border:1px solid #e5e7eb;
+
+ border-radius:14px;
+
+ padding:20px;
+
+ display:flex;
+
+ align-items:center;
+
+ gap:15px;
+
+ min-width:0;
+
+ overflow:hidden;
+
+ transition:.3s;
+
+}
+
+
+
+.member-card:hover {
+
+ background:#eff6ff;
+
+ border-color:#2563eb;
+
+ transform:translateY(-3px);
+
+}
+
+
+
+/* =========================
+ AVATAR
+========================= */
+
+
+.avatar {
+
+ width:55px;
+
+ height:55px;
+
+ min-width:55px;
+
+ border-radius:50%;
+
+ background:
+ linear-gradient(135deg,#2563eb,#7c3aed);
+
+ color:white;
+
+ font-size:22px;
+
+ font-weight:bold;
+
+ display:flex;
+
+ align-items:center;
+
+ justify-content:center;
+
+}
+
+
+
+/* =========================
+ MEMBER INFO
+========================= */
+
+
+.member-info {
+
+ flex:1;
+
+ min-width:0;
+
+}
+
+
+.member-info h4 {
+
+ color:#111827;
+
+ margin-bottom:5px;
+
+ font-size:1rem;
+
+ white-space:nowrap;
+
+ overflow:hidden;
+
+ text-overflow:ellipsis;
+
+}
+
+
+.member-info p {
+
+ color:#6b7280;
+
+ font-size:.9rem;
+
+ overflow-wrap:anywhere;
+
+ word-break:break-word;
+
+}
+
+
+
+/* =========================
+ EMPTY
+========================= */
+
+
+.no-members {
+
+ text-align:center;
+
+ padding:20px;
+
+ background:#f9fafb;
+
+ border-radius:10px;
+
+ color:#6b7280;
+
+ border:1px dashed #d1d5db;
+
+}
+
+
+
+/* =========================
+ SIDEBAR OPEN
+========================= */
+
+
+.sidebarcon.active 
+~ .content-container 
+.team-page {
+
+ margin-left:260px;
+
+ width:calc(100% - 260px);
+
+}
+
+
+
+/* =========================
+ MOBILE
+========================= */
+
+
+@media(max-width:768px){
+
+
+.team-page {
+
+ margin-left:0;
+
+ width:100%;
+
+ margin-top:70px;
+
+ padding:20px;
+
+}
+
+
+.members-grid {
+
+ grid-template-columns:1fr;
+
+}
+
+
+.member-card {
+
+ padding:15px;
+
+}
+
+
 }
