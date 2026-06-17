@@ -21,13 +21,13 @@
 
 /* Members */
 .members-section {
-  margin-bottom: 20px;
+  margin-bottom: 50px;
 }
 
 .member-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 20px;
 }
 
 .member-chip {
@@ -278,22 +278,16 @@
 .task-btn {
   background: linear-gradient(135deg, #16a34a, #22c55e);
   color: white;
-
   padding: 10px 18px;
   border: none;
   border-radius: 25px;
-
   font-size: 14px;
   font-weight: 500;
-
   cursor: pointer;
-
   display: flex;
   align-items: center;
   gap: 6px;
-
   transition: all 0.25s ease;
-
   box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
 }
 

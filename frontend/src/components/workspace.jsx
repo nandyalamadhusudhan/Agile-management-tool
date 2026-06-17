@@ -5,21 +5,21 @@ import "../workspace.css";
 
 function Workspace() {
   const navigate = useNavigate();
-
+  const token=localStorage.getItem("token");
+  const payload = token
+  ? JSON.parse(atob(token.split(".")[1]))
+  : null;
+  const currentUserId = payload?.id;
   const [showModal, setShowModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
-
   const [workspaceCount, setWorkspaceCount] = useState(0);
   const [workspaces, setWorkspaces] = useState([]);
-
   const [selectedWorkspace, setSelectedWorkspace] = useState("");
   const [memberEmail, setMemberEmail] = useState("");
-
   const [workspaceData, setWorkspaceData] = useState({
     workspaceName: "",
     description: "",
   });
-
   useEffect(() => {
     fetchWorkspaceCount();
     fetchWorkspaces();
@@ -109,7 +109,6 @@ function Workspace() {
   const inviteMember = async () => {
   try {
     const token = localStorage.getItem("token");
-
     const res = await axios.post(
       "http://localhost:5000/workspace/invite",
       {
@@ -156,28 +155,30 @@ function Workspace() {
       </div>
 
       <div className="workspace-list">
-        {workspaces.map((workspace) => (
-          <div
-            key={workspace._id}
-            className="workspace-card"
-            onClick={() => openWorkspaceBoard(workspace)}
-          >
-            <h3>{workspace.name}</h3>
-            <p>{workspace.description || "No Description"}</p>
-            <button
-  className="member-btn"
-  onClick={(e) => {
-    e.stopPropagation();
-    openInviteModal(workspace._id);
-  }}
->
-  Add Members
-</button>
-          </div>
-        ))}
-      </div>
+  {workspaces.map((workspace) => (
+    <div
+      key={workspace._id}
+      className="workspace-card"
+      onClick={() => openWorkspaceBoard(workspace)}
+    >
+      <h3>{workspace.name}</h3>
+      <p>{workspace.description || "No Description"}</p>
 
-      {/* CREATE MODAL */}
+      {workspace.owner === currentUserId && (
+        <button
+          className="member-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            openInviteModal(workspace._id);
+          }}
+        >
+          Add Members
+        </button>
+      )}
+    </div>
+  ))}
+</div>
+  
       {showModal && (
   <div className="modal-overlay">
     <div className="modal">

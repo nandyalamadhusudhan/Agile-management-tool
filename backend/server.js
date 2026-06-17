@@ -13,6 +13,7 @@ const Message= require("./models/message");
 const app = express();
 const server=http.createServer(app);
 const { Server }=require("socket.io");
+const Invitation = require("./models/inivitation");
 const secretKey = "venkatalakshmi1";
 app.use(cors());
 app.use(express.json());
@@ -26,15 +27,15 @@ const io=new Server(server,{
 })
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
-
+  socket.on("register", (userId) => {
+    socket.join(userId);
+    console.log(`User ${userId} joined room`);
+  });
   socket.on("joinWorkspace", ({ workspaceId, token }) => {
     try {
       const payload = jwt.verify(token, secretKey);
-
       socket.username = payload.name;
-
       socket.join(workspaceId);
-
       console.log(
         `${socket.username} joined workspace ${workspaceId}`
       );
@@ -42,7 +43,6 @@ io.on("connection", (socket) => {
       console.log(err);
     }
   });
-
   socket.on(
     "sendMessage",
     async ({ workspaceId, text }) => {
@@ -297,13 +297,105 @@ if (alreadyMember) {
     message: "Already a member"
   });
 }
-    workspace.members.push(user._id);
-    await workspace.save();
-    res.json({ message: "Member added successfully" });
+  const invitation = await Invitation.create({
+  workspace: workspace._id,
+  sender: req.user.id,
+  receiver: user._id,
+});
+
+io.to(user._id.toString()).emit(
+  "workspace-invited",
+  {
+    invitationId: invitation._id,
+    sender: req.user.name,
+    workspaceName: workspace.name,
+  }
+);
+return res.status(200).json({
+  message: "INVITATION REQUEST SEND WAITING FOR THE RESPONSE",
+});
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
+app.post("/workspace/accept",authMiddleware,async (req, res) => {
+    try {
+      const { invitationId } = req.body;
+
+      const invitation =
+        await Invitation.findById(
+          invitationId
+        );
+
+      if (
+  invitation.receiver.toString() !==
+  req.user.id
+) {
+  return res.status(403).json({
+    message: "Unauthorized",
+  });
+}
+
+      const workspace =
+        await Workspace.findById(
+          invitation.workspace
+        );
+
+      const alreadyMember =
+        workspace.members.some(
+          (member) =>
+            member.toString() ===
+            invitation.receiver.toString()
+        );
+
+      if (!alreadyMember) {
+        workspace.members.push(
+          invitation.receiver
+        );
+
+        await workspace.save();
+      }
+
+      invitation.status = "Accepted";
+      await invitation.save();
+
+      res.json({
+        message: "Workspace joined",
+      });
+    } catch (err) {
+      res.status(500).json({
+        message: err.message,
+      });
+    }
+  }
+);
+app.post("/workspace/reject",authMiddleware,async (req, res) => {
+    try {
+      const { invitationId } = req.body;
+      const invitation =
+        await Invitation.findById(
+          invitationId
+        );
+      if (
+  invitation.receiver.toString() !==
+  req.user.id
+) {
+  return res.status(403).json({
+    message: "Unauthorized",
+  });
+}
+      invitation.status = "Rejected";
+      await invitation.save();
+      res.json({
+        message: "Invitation rejected",
+      });
+    } catch (err) {
+      res.status(500).json({
+        message: err.message,
+      });
+    }
+  }
+);
 
 // GET WORKSPACE MEMBERS
 app.get("/workspace/:id/members", authMiddleware, async (req, res) => {

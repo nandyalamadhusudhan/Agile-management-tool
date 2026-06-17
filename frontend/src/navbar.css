@@ -61,3 +61,110 @@
   color: white;
   cursor: pointer;
 }
+.notification-sidebar {
+  position: fixed;
+  top: 0;
+  right: -350px;
+  width: 350px;
+  height: 100vh;
+  background: #fff;
+  box-shadow: -3px 0 15px rgba(0,0,0,0.15);
+  transition: right 0.3s ease;
+  z-index: 2000;
+}
+
+.notification-sidebar.open {
+  right: 0;
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px;
+  border-bottom: 1px solid #ddd;
+}
+
+.notification-header h3 {
+  margin: 0;
+}
+
+.close-icon {
+  cursor: pointer;
+  font-size: 18px;
+}
+.notification-list {
+  padding: 15px;
+}
+.notification-item:hover {
+  background: #e9eef8;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.25);
+  z-index: 1999;
+}
+
+.nav-icon {
+  cursor: pointer;
+  font-size: 20px;
+}
+.notification-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.accept-btn,
+.reject-btn {
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+/* Accept Button */
+.accept-btn {
+  background: #22c55e;
+  color: white;
+}
+
+.accept-btn:hover {
+  background: #16a34a;
+  transform: translateY(-2px);
+}
+
+/* Reject Button */
+.reject-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.reject-btn:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+}
+
+/* Click Effect */
+.accept-btn:active,
+.reject-btn:active {
+  transform: scale(0.96);
+}
+.notification-item {
+  background: #fff;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.notification-item p {
+  margin-bottom: 10px;
+  line-height: 1.5;
+  color: #333;
+}
