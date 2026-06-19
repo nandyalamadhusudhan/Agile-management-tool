@@ -3,11 +3,9 @@ import axios from "axios";
 import "../teams.css";
 function Team() {
   const [workspaces, setWorkspaces] = useState([]);
-
   useEffect(() => {
     getTeams();
   }, []);
-
   const getTeams = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -25,7 +23,6 @@ function Team() {
       console.log(err);
     }
   };
-
   return (
    <div className="team-page">
   <h1>My Workspaces</h1>
@@ -35,7 +32,6 @@ function Team() {
         <h2>{workspace.name}</h2>
         <p>{workspace.description}</p>
       </div>
-
       <h3 className="members-title">
         Team Members ({workspace.members.length})
       </h3>

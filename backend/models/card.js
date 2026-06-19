@@ -26,6 +26,9 @@ const CardSchema = new mongoose.Schema({
   dueDate: Date,
   listName: {
     type: String,
+    enum:["Todo",
+"In Progress",
+"Completed"],
     default: "Todo",
   },
 }, {

@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../workspace.css";
-
 function Workspace() {
   const navigate = useNavigate();
   const token=localStorage.getItem("token");
@@ -163,7 +162,6 @@ const deleteWorkspace = async(id)=>{
         headers: { Authorization: `Bearer ${token}` },
       }
     );
-
     alert(res.data.message);
     setShowInviteModal(false);
     setMemberEmail("");
@@ -174,7 +172,6 @@ const deleteWorkspace = async(id)=>{
     );
   }
 };
-
   // NAVIGATE TO BOARD
   const openWorkspaceBoard = (workspace) => {
     navigate(`/workspace/${workspace._id}`, {
@@ -201,25 +198,14 @@ const deleteWorkspace = async(id)=>{
 
       <div className="workspace-list">
   {workspaces.map((workspace) => (
-    <div
- key={workspace._id}
- className="workspace-card"
- onClick={() => openWorkspaceBoard(workspace)}
->
+  <div key={workspace._id} className="workspace-card" onClick={() => openWorkspaceBoard(workspace)}>
 
-<h3>{workspace.name}</h3>
+  <h3>{workspace.name}</h3>
 
-<p>
- {workspace.description || "No Description"}
-</p>
-
-
+<p>{workspace.description || "No Description"}</p>
 {workspace.owner === currentUserId && (
-
  <>
-
- <button
- className="member-btn"
+ <button className="member-btn"
  onClick={(e)=>{
    e.stopPropagation();
    openInviteModal(workspace._id);
@@ -227,8 +213,6 @@ const deleteWorkspace = async(id)=>{
  >
  Add Members
  </button>
-
-
  <button
  className="delete-btn"
  onClick={(e)=>{

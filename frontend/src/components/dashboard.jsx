@@ -50,20 +50,16 @@ function Dashboard() {
           Welcome back to CollabSpace. Here's your project overview.
         </p>
       </div>
-
       {/* Statistics */}
       <div className="cards">
-
         <div className="card">
           <h2>{stats.workspaces}</h2>
           <p>Workspaces</p>
         </div>
-
         <div className="card">
           <h2>{stats.boards}</h2>
           <p>Boards</p>
         </div>
-
         <div className="card">
           <h2>{stats.users}</h2>
           <p>Team Members</p>
@@ -72,9 +68,7 @@ function Dashboard() {
           <h2>{stats.cards}</h2>
           <p>Tasks</p>
         </div>
-
       </div>
-
       {/* Quick Actions */}
       <div className="section">
         <h2>Quick Actions</h2>
@@ -85,22 +79,18 @@ function Dashboard() {
           <button>Invite Member</button>
         </div>
       </div>
-
       {/* Task Overview */}
       <div className="section">
   <h2>Task Overview</h2>
-
   <div className="task-overview">
     <div className="status-card">
       <h3>{stats.pending}</h3>
       <p>Pending</p>
     </div>
-
     <div className="status-card">
       <h3>{stats.inProgress}</h3>
       <p>In Progress</p>
     </div>
-
     <div className="status-card">
       <h3>{stats.completed}</h3>
       <p>Completed</p>

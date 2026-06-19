@@ -3,6 +3,7 @@ import { useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import "../board.css";
 import { useNavigate } from "react-router-dom";
+import {DragDropContext,Droppable,Draggable} from "@hello-pangea/dnd";
 function Board() {
   const { id } = useParams();
   const location = useLocation();
@@ -23,7 +24,6 @@ function Board() {
   const navigate=useNavigate();
 useEffect(() => {
   const token = localStorage.getItem("token");
-
   if (token) {
     const payload = JSON.parse(
       atob(token.split(".")[1])
@@ -34,7 +34,101 @@ useEffect(() => {
     }
   }
 }, [location]);
-  const openchat=()=>{
+const onDragEnd = async (result) => {
+  const { destination, draggableId } = result;
+
+  if (!destination) return;
+
+  const parts = destination.droppableId.split("-");
+
+  const newStatus = parts.slice(1).join("-");
+
+  try {
+
+    const token = localStorage.getItem("token");
+
+    await axios.put(
+      `http://localhost:5000/cards/${draggableId}/move`,
+      {
+        listName: newStatus,
+      },
+      {
+        headers:{
+          Authorization:`Bearer ${token}`
+        }
+      }
+    );
+
+    fetchBoards();
+
+  } catch(err){
+    console.log(
+      err.response?.data || err.message
+    );
+  }
+};
+const renderCard = (card) => (
+  <div
+    key={card._id}
+    className="task-card"
+  >
+    <div className="task-top">
+      <h4 className="task-title">
+        {card.title}
+      </h4>
+
+      <div className="task-actions">
+        <span
+          className={`priority-${(
+            card.priority || "Medium"
+          ).toLowerCase()}`}
+        >
+          {card.priority || "Medium"}
+        </span>
+
+        <button
+          className="task-delete-btn"
+          onClick={() =>
+            deleteCard(card._id)
+          }
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+
+    {card.description && (
+      <p className="task-desc">
+        {card.description}
+      </p>
+    )}
+
+    <div className="task-details">
+      <div className="detail-item">
+        👤 <strong>Assigned:</strong>{" "}
+        {card.assignedTo?.name ||
+          "Unassigned"}
+      </div>
+
+      <div className="detail-item">
+        📅 <strong>Due:</strong>{" "}
+        {card.dueDate
+          ? new Date(
+              card.dueDate
+            ).toLocaleDateString()
+          : "Not Set"}
+      </div>
+
+      <div className="detail-item">
+        📌 <strong>Status:</strong>{" "}
+        <span className="status-badge">
+          {card.listName || "Todo"}
+        </span>
+      </div>
+    </div>
+  </div>
+);
+const openchat=()=>{
       if (!workspaceId) {
     console.error("Workspace ID missing");
     return;
@@ -115,6 +209,7 @@ setBoards(res.data);
           priority: taskPriority,
           assignedTo,
           boardId: selectedBoard,
+          listName:"Todo"
         },
         {
           headers: {
@@ -229,7 +324,6 @@ const removeMember = async (memberId) => {
           {members.map((m) => (
   <div key={m._id} className="member-chip">
     <span>{m.name}</span>
-
    {isOwner && (
   <button
   className="remove-member-btn"
@@ -259,12 +353,12 @@ const removeMember = async (memberId) => {
   💬 Chat
 </button>
       </div>
+ <DragDropContext onDragEnd={onDragEnd}>   
 <div className="boards-grid">
   {boards.map((board) => (
     <div key={board._id} className="board-card">
       <div className="board-header-row">
         <h3>{board.title}</h3>
-
         <button
           className="delete-btn"
           onClick={() => deleteBoard(board._id)}
@@ -272,72 +366,69 @@ const removeMember = async (memberId) => {
           Delete
         </button>
       </div>
+ <div className="kanban-board">
 
-      <div className="task-list">
-        {board.cards?.length > 0 ? (
-          board.cards.map((card) => (
-            <div key={card._id} className="task-card">
-              <div className="task-top">
-  <h4 className="task-title">
-    {card.title}
-  </h4>
-
-  <div className="task-actions">
-    <span
-      className={`priority-${(
-        card.priority || "Medium"
-      ).toLowerCase()}`}
+{
+  ["Todo","In Progress","Completed"].map((status)=>(
+    
+    <Droppable
+      key={`${board._id}-${status}`}
+      droppableId={`${board._id}-${status}`}
     >
-      {card.priority || "Medium"}
-    </span>
 
-    <button
-      className="task-delete-btn"
-      onClick={() => deleteCard(card._id)}
-    >
-      Delete
-    </button>
-  </div>
-</div>
-              {card.description && (
-                <p className="task-desc">
-                  {card.description}
-                </p>
-              )}
+    {(provided)=>(
 
-              <div className="task-details">
-                <div className="detail-item">
-                  👤 <strong>Assigned:</strong>{" "}
-                  {card.assignedTo?.name || "Unassigned"}
-                </div>
+      <div
+        className="status-column"
+        ref={provided.innerRef}
+        {...provided.droppableProps}
+      >
+        {
+          board.cards
+          ?.filter(card => card.listName === status)
+          .map((card,index)=>(
 
-                <div className="detail-item">
-                  📅 <strong>Due:</strong>{" "}
-                  {card.dueDate
-                    ? new Date(
-                        card.dueDate
-                      ).toLocaleDateString()
-                    : "Not Set"}
-                </div>
+            <Draggable
+              key={card._id}
+              draggableId={card._id}
+              index={index}
+            >
 
-                <div className="detail-item">
-                  📌 <strong>Status:</strong>{" "}
-                  <span className="status-badge">
-                    {card.listName || "Todo"}
-                  </span>
-                </div>
+            {(provided)=>(
+
+              <div
+                ref={provided.innerRef}
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
+              >
+
+                {renderCard(card)}
+
               </div>
-            </div>
+
+            )}
+
+            </Draggable>
+
           ))
-        ) : (
-          <div className="empty-task">
-            No Tasks Found
-          </div>
-        )}
+        }
+
+        {provided.placeholder}
+
       </div>
-    </div>
-  ))}
+
+    )}
+
+    </Droppable>
+
+  ))
+}
 </div>
+</div>
+    ))}
+
+</div>
+</DragDropContext> 
       {showBoardModal && (
         <div className="modal-overlay">
           <div className="modal-content">

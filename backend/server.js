@@ -491,21 +491,16 @@ app.post("/boards", authMiddleware, async (req, res) => {
 app.delete("/boards/:id", authMiddleware, async (req, res) => {
   try {
     const board = await Board.findById(req.params.id);
-
     if (!board) {
       return res.status(404).json({ message: "Board not found" });
     }
-
     if (board.createdBy.toString() !== req.user.id) {
       return res.status(403).json({ message: "Not allowed" });
     }
-
     await Card.deleteMany({
       board: board._id,
     });
-
     await Board.findByIdAndDelete(board._id);
-
     res.json({
       message: "Board and all tasks deleted successfully",
     });
@@ -563,6 +558,25 @@ app.delete("/cards/:id", authMiddleware, async (req, res) => {
     });
   }
 });
+//update tasks by drag and srop
+app.put("/cards/:id/move",authMiddleware,async (req, res) => {
+    try {
+      const { listName } = req.body;
+
+      const card = await Card.findByIdAndUpdate(
+        req.params.id,
+        { listName },
+        { new: true }
+      );
+
+      res.json(card);
+    } catch (err) {
+      res.status(500).json({
+        message: err.message,
+      });
+    }
+  }
+);
 app.get("/workspace/:workspaceId/members",authMiddleware,async (req, res) => {
     try {
       const workspace =

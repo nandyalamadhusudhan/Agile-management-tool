@@ -4,28 +4,24 @@
   box-sizing: border-box;
   font-family: Arial, sans-serif;
 }
-
 .workspace-container {
   padding: 25px;
   margin-left: 105px;
   min-height: 100vh;
   background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  text-transform: capitalize;
 }
-
 .workspace-container h1 {
   color: #0f172a;
   margin-bottom: 20px;
 }
-
 .workspace-summary {
   background: white;
   padding: 18px 22px;
   border-radius: 16px;
-
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 
   margin-bottom: 25px;

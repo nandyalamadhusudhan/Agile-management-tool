@@ -267,7 +267,6 @@ const rejectInvite = async (invitationId) => {
           </strong>
           {" workspace"}
         </p>
-
         <div className="notification-actions">
           <button
             className="accept-btn"
@@ -275,7 +274,6 @@ const rejectInvite = async (invitationId) => {
           >
             Accept
           </button>
-
           <button
             className="reject-btn"
             onClick={() => rejectInvite(n._id)}
@@ -285,13 +283,10 @@ const rejectInvite = async (invitationId) => {
         </div>
       </>
     )}
-
   </div>
-
 ))}
 </div>
 </div>
-
 {showNotifications && (
   <div
     className="overlay"

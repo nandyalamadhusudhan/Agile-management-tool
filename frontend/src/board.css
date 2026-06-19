@@ -6,6 +6,7 @@ BOARD PAGE
 padding: 25px;
 background: #f4f7fb;
 min-height: 100vh;
+text-transform: capitalize;
 }
 
 /* =========================
@@ -394,4 +395,8 @@ width: 100%;
 .boards-grid {
 grid-template-columns: 1fr;
 }
+}
+
+.task-card {
+  margin-bottom: 20px;
 }

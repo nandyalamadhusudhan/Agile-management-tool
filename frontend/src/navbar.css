@@ -76,7 +76,6 @@
 .notification-sidebar.open {
   right: 0;
 }
-
 .notification-header {
   display: flex;
   justify-content: space-between;
@@ -84,11 +83,9 @@
   padding: 25px;
   border-bottom: 1px solid #ddd;
 }
-
 .notification-header h3 {
   margin: 0;
 }
-
 .close-icon {
   cursor: pointer;
   font-size: 18px;
