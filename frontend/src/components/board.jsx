@@ -28,7 +28,7 @@ useEffect(() => {
     const payload = JSON.parse(
       atob(token.split(".")[1])
     );
-
+    console.log(payload.id);
     if (location.state?.owner === payload.id) {
       setIsOwner(true);
     }
