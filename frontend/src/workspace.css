@@ -176,3 +176,34 @@
 .modal-buttons button {
   flex: 1;
 }
+.workspace-card{
+  position:relative;
+}
+
+
+/* delete button right top corner */
+.workspace-card .delete-btn{
+  position:absolute;
+  top:15px;
+  right:15px;
+
+  background:#ff4d4d;
+  color:white;
+  border:none;
+
+  padding:7px 14px;
+  border-radius:6px;
+
+  cursor:pointer;
+}
+
+
+.workspace-card .delete-btn:hover{
+  background:#e60000;
+}
+
+
+/* keep add member button normal */
+.workspace-card .member-btn{
+  margin-top:15px;
+}

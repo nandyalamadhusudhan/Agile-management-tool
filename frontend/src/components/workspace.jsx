@@ -97,6 +97,50 @@ function Workspace() {
     );
   }
 };
+const deleteWorkspace = async(id)=>{
+
+  const confirmDelete = window.confirm(
+    "Delete this workspace?"
+  );
+
+  if(!confirmDelete) return;
+
+
+  try{
+
+    const token = localStorage.getItem("token");
+
+
+    await axios.delete(
+      `http://localhost:5000/workspace/${id}`,
+      {
+        headers:{
+          Authorization:`Bearer ${token}`
+        }
+      }
+    );
+
+
+    setWorkspaces(
+      workspaces.filter(
+        w=>w._id !== id
+      )
+    );
+
+
+    alert("Workspace deleted");
+
+
+  }catch(err){
+
+    alert(
+      err.response?.data?.message ||
+      err.message
+    );
+
+  }
+
+};
 
   // OPEN INVITE
   const openInviteModal = (workspaceId) => {
@@ -137,6 +181,7 @@ function Workspace() {
       state: {
         workspaceId: workspace._id,
         workspaceName: workspace.name,
+        owner: workspace.owner,
       },
     });
   };
@@ -157,25 +202,49 @@ function Workspace() {
       <div className="workspace-list">
   {workspaces.map((workspace) => (
     <div
-      key={workspace._id}
-      className="workspace-card"
-      onClick={() => openWorkspaceBoard(workspace)}
-    >
-      <h3>{workspace.name}</h3>
-      <p>{workspace.description || "No Description"}</p>
+ key={workspace._id}
+ className="workspace-card"
+ onClick={() => openWorkspaceBoard(workspace)}
+>
 
-      {workspace.owner === currentUserId && (
-        <button
-          className="member-btn"
-          onClick={(e) => {
-            e.stopPropagation();
-            openInviteModal(workspace._id);
-          }}
-        >
-          Add Members
-        </button>
-      )}
-    </div>
+<h3>{workspace.name}</h3>
+
+<p>
+ {workspace.description || "No Description"}
+</p>
+
+
+{workspace.owner === currentUserId && (
+
+ <>
+
+ <button
+ className="member-btn"
+ onClick={(e)=>{
+   e.stopPropagation();
+   openInviteModal(workspace._id);
+ }}
+ >
+ Add Members
+ </button>
+
+
+ <button
+ className="delete-btn"
+ onClick={(e)=>{
+   e.stopPropagation();
+   deleteWorkspace(workspace._id);
+ }}
+ >
+ Delete
+ </button>
+
+
+ </>
+
+)}
+
+</div>
   ))}
 </div>
   

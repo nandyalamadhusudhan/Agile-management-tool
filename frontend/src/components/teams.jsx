@@ -20,7 +20,6 @@ function Team() {
           }
         }
       );
-      console.log(res.data);
       setWorkspaces(res.data);
     } catch (err) {
       console.log(err);

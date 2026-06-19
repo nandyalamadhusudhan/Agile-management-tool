@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState,useEffect,useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSearch, FaBell, FaTimes } from "react-icons/fa";
 import "../navbar.css";
@@ -8,149 +8,301 @@ function Navbar() {
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const audioRef = useRef(new Audio("../notification.mp3"));
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
   useEffect(() => {
+
   socket.on("workspace-invited", (data) => {
-    setNotifications((prev) => [
+
+    if(audioRef.current){
+      audioRef.current.play().catch(()=>{});
+    }
+
+    setNotifications((prev)=>[
       data,
-      ...prev,
+      ...prev
     ]);
+
+    setUnreadCount((prev)=>prev+1);
   });
-  return () => {
+
+  // ADD THIS
+  socket.on("workspace-deleted",(data)=>{
+    if(audioRef.current){
+      audioRef.current.play().catch(()=>{});
+    }
+   console.log("DELETE EVENT RECEIVED:", data);
+    setNotifications((prev)=>[
+      {
+        _id: Date.now(),
+        type:"delete",
+        message:data.message
+      },
+      ...prev
+    ]);
+    setUnreadCount((prev)=>prev+1);
+  });
+  return ()=>{
     socket.off("workspace-invited");
+    socket.off("workspace-deleted");
   };
+
+},[]);
+useEffect(() => {
+  fetchNotifications();
 }, []);
+const fetchNotifications = async () => {
+  try {
+    const token =
+      localStorage.getItem("token");
+
+    const res = await axios.get(
+      "http://localhost:5000/workspace/invitations",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setNotifications(res.data);
+  } catch (err) {
+    console.error(err);
+  }
+};
 const acceptInvite = async (invitationId) => {
-  const token =
-    localStorage.getItem("token");
-  await axios.post(
-    "http://localhost:5000/workspace/accept",
-    { invitationId },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  alert("Succefully you in Joined workspace,Enjoy the workspace");
+  try {
+    const token = localStorage.getItem("token");
+
+    await axios.post(
+      "http://localhost:5000/workspace/accept",
+      { invitationId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setNotifications((prev) =>
+      prev.filter(
+        (n) => n._id !== invitationId
+      )
+    );
+
+    alert(
+      "Successfully joined workspace"
+    );
+  } catch (err) {
+    console.error(err);
+    alert("Failed to accept invitation");
+  }
 };
+
 const rejectInvite = async (invitationId) => {
-  const token =
-    localStorage.getItem("token");
-  await axios.post(
-    "http://localhost:5000/workspace/reject",
-    { invitationId },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  try {
+    const token = localStorage.getItem("token");
 
-  alert("Invitation rejected");
+    await axios.post(
+      "http://localhost:5000/workspace/reject",
+      { invitationId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setNotifications((prev) =>
+      prev.filter(
+        (n) => n._id !== invitationId
+      )
+    );
+
+    alert("Invitation rejected");
+  } catch (err) {
+    console.error(err);
+    alert("Failed to reject invitation");
+  }
 };
-  return (
-    <>
-      <nav className="navbar">
-        <div className="logo">CollabSpace</div>
+ return (
+<>
+<nav className="navbar">
 
-        <div className="search-box">
-          <FaSearch className="search-icon" />
-          <input
-            type="text"
-            placeholder="Search documents, teams..."
-          />
-        </div>
+  <div className="logo">
+    CollabSpace
+  </div>
 
-        <ul className="nav-links">
-          <li onClick={() => navigate("/mainpage")}>
-            Dashboard
-          </li>
-          <li onClick={() => navigate("/mainpage/workspace")}>
-            Workspace
-          </li>
-          <li onClick={() => navigate("/mainpage/teams")}>
-            Teams
-          </li>
-        </ul>
+  <div className="search-box">
+    <FaSearch className="search-icon" />
 
-        <div className="right-section">
-          <FaBell
-            className="nav-icon"
-            onClick={() =>
-              setShowNotifications(!showNotifications)
-            }
-          />
+    <input
+      type="text"
+      placeholder="Search documents, teams..."
+    />
+  </div>
 
-          <button
-            className="video-btn"
-            onClick={handleLogout}
-          >
-            Logout
-          </button>
-        </div>
-      </nav>
+  <ul className="nav-links">
+    <li onClick={() => navigate("/mainpage")}>
+      Dashboard
+    </li>
 
-      <div
-        className={`notification-sidebar ${
-          showNotifications ? "open" : ""
-        }`}
-      >
-        <div className="notification-header">
-          <h3>Notifications</h3>
+    <li onClick={() => navigate("/mainpage/workspace")}>
+      Workspace
+    </li>
 
-          <FaTimes
-            className="close-icon"
-            onClick={() =>
-              setShowNotifications(false)
-            }
-          />
-        </div>
+    <li onClick={() => navigate("/mainpage/teams")}>
+      Teams
+    </li>
+  </ul>
+  {/* Notification Bell */}
 
-        <div className="notification-list">
- {notifications.map((n) => (
   <div
-    key={n.invitationId}
+    className="notification-wrapper"
+    onClick={() => {
+      setShowNotifications(!showNotifications);
+
+      if (!showNotifications) {
+        setUnreadCount(0);
+      }
+    }}
+  >
+    <FaBell className="nav-icon" />
+    {unreadCount > 0 && (
+      <span className="notification-badge">
+        {unreadCount}
+      </span>
+    )}
+
+  </div>
+
+  {/* Logout */}
+
+  <div className="right-section">
+    <button
+      className="video-btn"
+      onClick={handleLogout}
+    >
+      Logout
+    </button>
+
+  </div>
+
+
+</nav>
+
+
+
+
+{/* Notification sidebar */}
+
+<div
+ className={`notification-sidebar ${
+   showNotifications ? "open" : ""
+ }`}
+>
+
+
+<div className="notification-header">
+
+<h3>
+ Notifications
+</h3>
+
+
+<FaTimes
+ className="close-icon"
+ onClick={() =>
+   setShowNotifications(false)
+ }
+/>
+
+
+</div>
+
+
+
+<div className="notification-list">
+
+
+{notifications.map((n) => (
+
+  <div
+    key={n._id}
     className="notification-item"
   >
-    <p>
-      <strong>{n.sender}</strong>
-      {" invited you to "}
-      <strong>{n.workspaceName}</strong>
-    </p>
 
-   <div className="notification-actions">
-  <button
-    className="accept-btn"
-    onClick={() => acceptInvite(n.invitationId)}
-  >
-    Accept
-  </button>
+    {n.type === "delete" ? (
+      <>
+        <p>
+          🗑️ <strong>{n.message}</strong>
+        </p>
 
-  <button
-    className="reject-btn"
-    onClick={() => rejectInvite(n.invitationId)}
-  >
-    Reject
-  </button>
-</div>
+        <div className="notification-actions">
+          <button
+            className="accept-btn"
+            onClick={() =>
+              setNotifications((prev) =>
+                prev.filter(
+                  (item) => item._id !== n._id
+                )
+              )
+            }
+          >
+            OK
+          </button>
+        </div>
+      </>
+    ) : (
+      <>
+        <p>
+          <strong>{n.sender?.name}</strong>
+          {" invited you to "}
+          <strong>
+            {n.workspace?.name || n.workspaceName}
+          </strong>
+          {" workspace"}
+        </p>
+
+        <div className="notification-actions">
+          <button
+            className="accept-btn"
+            onClick={() => acceptInvite(n._id)}
+          >
+            Accept
+          </button>
+
+          <button
+            className="reject-btn"
+            onClick={() => rejectInvite(n._id)}
+          >
+            Reject
+          </button>
+        </div>
+      </>
+    )}
+
   </div>
+
 ))}
 </div>
-      </div>
-      {showNotifications && (
-        <div
-          className="overlay"
-          onClick={() =>
-            setShowNotifications(false)
-          }
-        />
-      )}
-    </>
-  );
+</div>
+
+{showNotifications && (
+  <div
+    className="overlay"
+    onClick={() =>
+      setShowNotifications(false)
+    }
+  />
+)}
+
+</>
+);
 }
 
 export default Navbar;

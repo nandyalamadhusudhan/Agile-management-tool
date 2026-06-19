@@ -168,3 +168,24 @@
   line-height: 1.5;
   color: #333;
 }
+.notification-wrapper{
+  position:relative;
+  cursor:pointer;
+}
+
+
+.notification-badge{
+  position:absolute;
+  top:-8px;
+  right:-8px;
+  background:red;
+  color:white;
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:12px;
+  font-weight:bold;
+}

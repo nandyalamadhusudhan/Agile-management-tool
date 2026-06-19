@@ -19,7 +19,21 @@ function Board() {
   const [taskDescription, setTaskDescription] = useState("");
   const [taskPriority, setTaskPriority] = useState("Medium");
   const [assignedTo, setAssignedTo] = useState("");
+  const [isOwner, setIsOwner] = useState(false);
   const navigate=useNavigate();
+useEffect(() => {
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    const payload = JSON.parse(
+      atob(token.split(".")[1])
+    );
+
+    if (location.state?.owner === payload.id) {
+      setIsOwner(true);
+    }
+  }
+}, [location]);
   const openchat=()=>{
       if (!workspaceId) {
     console.error("Workspace ID missing");
@@ -43,7 +57,6 @@ function Board() {
     },
   }
 );
-console.log("BOARDS DATA:", res.data);
 setBoards(res.data);
     } catch (err) {
       console.log(err.response?.data || err.message);
@@ -123,6 +136,30 @@ setBoards(res.data);
       console.log(err.response?.data || err.message);
     }
   };
+  const deleteCard = async (cardId) => {
+  const confirmDelete = window.confirm(
+    "Delete this task?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    const token = localStorage.getItem("token");
+
+    await axios.delete(
+      `http://localhost:5000/cards/${cardId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    fetchBoards(); // refresh boards after deleting
+  } catch (err) {
+    console.log(err.response?.data || err.message);
+  }
+};
   const deleteBoard = async (boardId) => {
   const confirmDelete = window.confirm(
     "Delete this board and all tasks?"
@@ -149,6 +186,29 @@ setBoards(res.data);
     console.log(err.response?.data || err.message);
   }
 };
+const removeMember = async (memberId) => {
+  const confirmRemove = window.confirm(
+    "Remove this member from the workspace?"
+  );
+  if (!confirmRemove) return;
+  try {
+    const token = localStorage.getItem("token");
+    await axios.delete(
+      `http://localhost:5000/workspace/${workspaceId}/members/${memberId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setMembers(
+      members.filter((m) => m._id !== memberId)
+    );
+  } catch (err) {
+    console.log(err.response?.data || err.message);
+  }
+};
   return (
     <div className="board-container">
       <div className="board-top">
@@ -167,13 +227,21 @@ setBoards(res.data);
         <h4>Team Members</h4>
         <div className="member-list">
           {members.map((m) => (
-            <span key={m._id} className="member-chip">
-              {m.name}
-            </span>
-          ))}
+  <div key={m._id} className="member-chip">
+    <span>{m.name}</span>
+
+   {isOwner && (
+  <button
+  className="remove-member-btn"
+  onClick={() => removeMember(m._id)}
+>
+  ✕
+</button>
+)}
+  </div>
+))}
         </div>
       </div>
-
       <div className="action-bar">
         <button
           className="create-board-btn"
@@ -181,7 +249,6 @@ setBoards(res.data);
         >
           + Create Board
         </button>
-
         <button
           className="task-btn"
           onClick={() => setShowTaskModal(true)}
@@ -211,19 +278,27 @@ setBoards(res.data);
           board.cards.map((card) => (
             <div key={card._id} className="task-card">
               <div className="task-top">
-                <h4 className="task-title">
-                  {card.title}
-                </h4>
+  <h4 className="task-title">
+    {card.title}
+  </h4>
 
-                <span
-                  className={`priority-${(
-                    card.priority || "Medium"
-                  ).toLowerCase()}`}
-                >
-                  {card.priority || "Medium"}
-                </span>
-              </div>
+  <div className="task-actions">
+    <span
+      className={`priority-${(
+        card.priority || "Medium"
+      ).toLowerCase()}`}
+    >
+      {card.priority || "Medium"}
+    </span>
 
+    <button
+      className="task-delete-btn"
+      onClick={() => deleteCard(card._id)}
+    >
+      Delete
+    </button>
+  </div>
+</div>
               {card.description && (
                 <p className="task-desc">
                   {card.description}

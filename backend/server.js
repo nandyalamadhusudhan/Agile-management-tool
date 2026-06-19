@@ -15,13 +15,41 @@ const server=http.createServer(app);
 const { Server }=require("socket.io");
 const Invitation = require("./models/inivitation");
 const secretKey = "venkatalakshmi1";
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
+mongoose
+  .connect("mongodb://127.0.0.1:27017/agiletool")
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.log(err));
+  const authMiddleware = (req, res, next) => {
+  try {
+    const authHeader = req.header("Authorization");
+
+    if (!authHeader) {
+      return res.status(401).json({ message: "No token provided" });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    if (!token) {
+      return res.status(401).json({ message: "Invalid token format" });
+    }
+    const decoded = jwt.verify(token, secretKey);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: "Invalid or Expired Token" });
+  }
+};
 const io=new Server(server,{
   cors:{
-    origin:"*",
+    origin:"http://localhost:5173",
     methods:["GET","POST"],
   }
 })
@@ -70,37 +98,7 @@ app.get(
     res.json(messages);
   }
 );
-// ---------------- MIDDLEWARE ----------------
 
-// ---------------- DB CONNECTION ----------------
-mongoose
-  .connect("mongodb://127.0.0.1:27017/agiletool")
-  .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.log(err));
-
-// ---------------- AUTH MIDDLEWARE ----------------
-const authMiddleware = (req, res, next) => {
-  try {
-    const authHeader = req.header("Authorization");
-
-    if (!authHeader) {
-      return res.status(401).json({ message: "No token provided" });
-    }
-
-    const token = authHeader.split(" ")[1];
-
-    if (!token) {
-      return res.status(401).json({ message: "Invalid token format" });
-    }
-    const decoded = jwt.verify(token, secretKey);
-    req.user = decoded;
-    next();
-  } catch (error) {
-    return res.status(401).json({ message: "Invalid or Expired Token" });
-  }
-};
-
-// ---------------- AUTH ROUTES ----------------
 
 // REGISTER
 app.post("/register", async (req, res) => {
@@ -249,8 +247,6 @@ app.post("/workspace/create", authMiddleware, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
-// COUNT
 app.get("/workspace/count", authMiddleware, async (req, res) => {
   try {
     const count = await Workspace.countDocuments();
@@ -260,16 +256,48 @@ app.get("/workspace/count", authMiddleware, async (req, res) => {
   }
 });
 
-// GET ALL WORKSPACES
 app.get("/workspace/all", authMiddleware, async (req, res) => {
   try {
     const workspaces = await Workspace.find({
-      members: req.user.id
-    }).sort({ createdAt: -1 });
+      members: req.user.id,
+    });
 
     res.json(workspaces);
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+});
+app.delete("/workspace/:id", authMiddleware, async (req, res) => {
+  try {
+    const workspace = await Workspace.findById(req.params.id);
+    console.log("Members:", workspace.members);
+    if (!workspace) {
+      return res.status(404).json({
+        message: "Workspace not found",
+      });
+    }
+
+    // Send notification to all members
+    workspace.members.forEach((memberId) => {
+      io.to(memberId.toString()).emit(
+        "workspace-deleted",
+        {
+          type: "workspaceDeleted",
+          workspaceName: workspace.name,
+          message: `${workspace.name} workspace has been deleted`,
+        }
+      );
+    });
+
+    await Workspace.findByIdAndDelete(req.params.id);
+
+    res.json({
+      message: "Workspace deleted successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
   }
 });
 
@@ -306,9 +334,13 @@ if (alreadyMember) {
 io.to(user._id.toString()).emit(
   "workspace-invited",
   {
-    invitationId: invitation._id,
-    sender: req.user.name,
-    workspaceName: workspace.name,
+    _id: invitation._id,
+    sender: {
+      name: req.user.name,
+    },
+    workspace: {
+      name: workspace.name,
+    },
   }
 );
 return res.status(200).json({
@@ -327,42 +359,45 @@ app.post("/workspace/accept",authMiddleware,async (req, res) => {
           invitationId
         );
 
-      if (
-  invitation.receiver.toString() !==
-  req.user.id
-) {
-  return res.status(403).json({
-    message: "Unauthorized",
-  });
-}
+      if (!invitation) {
+        return res.status(404).json({
+          message: "Invitation not found",
+        });
+      }
 
       const workspace =
         await Workspace.findById(
           invitation.workspace
         );
 
-      const alreadyMember =
-        workspace.members.some(
-          (member) =>
-            member.toString() ===
-            invitation.receiver.toString()
-        );
+      if (!workspace) {
+        return res.status(404).json({
+          message: "Workspace not found",
+        });
+      }
 
-      if (!alreadyMember) {
+      // Add receiver to members
+      if (
+        !workspace.members.includes(
+          invitation.receiver
+        )
+      ) {
         workspace.members.push(
           invitation.receiver
         );
-
-        await workspace.save();
       }
+
+      await workspace.save();
 
       invitation.status = "Accepted";
       await invitation.save();
 
       res.json({
-        message: "Workspace joined",
+        message:
+          "Successfully joined workspace and Enjoy the workspace",
       });
     } catch (err) {
+      console.error(err);
       res.status(500).json({
         message: err.message,
       });
@@ -376,45 +411,44 @@ app.post("/workspace/reject",authMiddleware,async (req, res) => {
         await Invitation.findById(
           invitationId
         );
-      if (
-  invitation.receiver.toString() !==
-  req.user.id
-) {
-  return res.status(403).json({
-    message: "Unauthorized",
-  });
-}
+      if (!invitation) {
+        return res.status(404).json({
+          message: "Invitation not found",
+        });
+      }
       invitation.status = "Rejected";
       await invitation.save();
       res.json({
-        message: "Invitation rejected",
+        message:
+          "Invitation rejected",
       });
     } catch (err) {
+      console.error(err);
       res.status(500).json({
         message: err.message,
       });
     }
   }
 );
+app.get("/workspace/invitations",authMiddleware,async (req, res) => {
+    try {
+      const invitations =
+        await Invitation.find({
+          receiver: req.user.id,
+          status: "Pending",
+        })
+          .populate("sender", "name")
+          .populate("workspace", "name");
 
-// GET WORKSPACE MEMBERS
-app.get("/workspace/:id/members", authMiddleware, async (req, res) => {
-  try {
-    const workspace = await Workspace.findById(req.params.id).populate(
-      "members",
-      "name email"
-    );
-
-    if (!workspace) {
-      return res.status(404).json({ message: "Workspace not found" });
+      res.json(invitations);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        message: err.message,
+      });
     }
-
-    res.json(workspace.members);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
   }
-});
-
+);
 // ---------------- BOARD ROUTES ----------------
 
 // GET BOARDS
@@ -516,6 +550,72 @@ app.post("/cards",authMiddleware, async (req, res) => {
     });
   }
 });
+app.delete("/cards/:id", authMiddleware, async (req, res) => {
+  try {
+    await Card.findByIdAndDelete(req.params.id);
+
+    res.json({
+      message: "Task deleted successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+});
+app.get("/workspace/:workspaceId/members",authMiddleware,async (req, res) => {
+    try {
+      const workspace =
+        await Workspace.findById(
+          req.params.workspaceId
+        ).populate("members", "name email");
+
+      if (!workspace) {
+        return res.status(404).json({
+          message: "Workspace not found",
+        });
+      }
+
+      res.json(workspace.members);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        message: err.message,
+      });
+    }
+  }
+);
+app.delete("/workspace/:workspaceId/members/:memberId",authMiddleware,async (req, res) => {
+    try {
+      const { workspaceId, memberId } = req.params;
+
+      const workspace = await Workspace.findById(
+        workspaceId
+      );
+
+      workspace.members = workspace.members.filter(
+        (id) => id.toString() !== memberId
+      );
+
+      await workspace.save();
+
+      // Send notification
+      io.to(memberId).emit("member-removed", {
+        workspaceId,
+        workspaceName: workspace.name,
+        message: `You have been removed from ${workspace.name} workspace`,
+      });
+
+      res.json({
+        message: "Member removed successfully",
+      });
+    } catch (err) {
+      res.status(500).json({
+        message: err.message,
+      });
+    }
+  }
+);
 app.get("/api/workspaces/myteams", authMiddleware, async (req, res) => {
   try {
     const workspaces = await Workspace.find({
