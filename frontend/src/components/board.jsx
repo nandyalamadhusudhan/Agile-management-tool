@@ -58,7 +58,6 @@ if (res.data.length > 0) {
   }
 };
 const onDragEnd = async (result) => {
-
   const {
     destination,
     draggableId
