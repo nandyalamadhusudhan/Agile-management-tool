@@ -232,19 +232,27 @@ app.get("/dashboard", authMiddleware, async (req, res) => {
 app.post("/workspace/create", authMiddleware, async (req, res) => {
   try {
     const { workspaceName, description } = req.body;
-    const workspace = new Workspace({
-      name: workspaceName,
+    const newWorkspace = await Workspace.create({
+      name:workspaceName,
       description,
       owner: req.user.id,
-      members: [req.user.id],
+      members: [req.user.id]
     });
-    await workspace.save();
+
+    await Board.create({
+      title: "Project Board",
+      workspace: newWorkspace._id,
+      createdBy: req.user.id
+    });
     res.status(201).json({
       message: "Workspace Created Successfully",
-      workspace,
+      workspace: newWorkspace
     });
+
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      message: err.message
+    });
   }
 });
 app.get("/workspace/count", authMiddleware, async (req, res) => {
@@ -454,6 +462,7 @@ app.get("/workspace/invitations",authMiddleware,async (req, res) => {
 // GET BOARDS
 app.get("/boards/:workspaceId", authMiddleware, async (req, res) => {
   try {
+
     const boards = await Board.find({
       workspace: req.params.workspaceId,
     })
@@ -463,12 +472,26 @@ app.get("/boards/:workspaceId", authMiddleware, async (req, res) => {
           path: "assignedTo",
           select: "name email",
         },
-      })
-      .sort({ createdAt: 1 });
+      });
+
+    console.log(
+      JSON.stringify(
+        boards,
+        null,
+        2
+      )
+    );
 
     res.json(boards);
+
   } catch (err) {
-    res.status(500).json({ message: err.message });
+
+    console.log(err);
+
+    res.status(500).json({
+      message: err.message,
+    });
+
   }
 });
 // CREATE BOARD
@@ -510,7 +533,7 @@ app.delete("/boards/:id", authMiddleware, async (req, res) => {
     });
   }
 });
-app.post("/cards",authMiddleware, async (req, res) => {
+app.post("/cards", authMiddleware, async (req, res) => {
   try {
     const {
       title,
@@ -518,30 +541,32 @@ app.post("/cards",authMiddleware, async (req, res) => {
       priority,
       assignedTo,
       boardId,
+      listName
     } = req.body;
+
     const card = await Card.create({
       title,
       description,
       priority,
       assignedTo,
       board: boardId,
-      listName: "Todo",
+      listName
     });
+
     await Board.findByIdAndUpdate(
       boardId,
       {
         $push: {
-          cards: card._id,
-        },
+          cards: card._id
+        }
       }
     );
-    const populatedCard = await Card.findById(card._id)
-      .populate("assignedTo", "name email");
-    res.status(201).json(populatedCard);
+
+    res.status(201).json(card);
+
   } catch (err) {
-    console.error(err);
     res.status(500).json({
-      message: "Failed to create task",
+      message: err.message
     });
   }
 });
@@ -562,13 +587,16 @@ app.delete("/cards/:id", authMiddleware, async (req, res) => {
 app.put("/cards/:id/move",authMiddleware,async (req, res) => {
     try {
       const { listName } = req.body;
-
-      const card = await Card.findByIdAndUpdate(
-        req.params.id,
-        { listName },
-        { new: true }
-      );
-
+     const card = await Card.findOneAndUpdate(
+  { _id: req.params.id },
+  {
+    listName: req.body.listName
+  },
+  {
+    returnDocument: "after"
+  }
+);
+ console.log("UPDATED CARD:", card);
       res.json(card);
     } catch (err) {
       res.status(500).json({

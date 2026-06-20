@@ -1,37 +1,35 @@
 const mongoose = require("mongoose");
 
-const CardSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-  },
+const cardSchema = new mongoose.Schema(
+  {
+    title: String,
 
-  description: String,
+    description: String,
 
-  assignedTo: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-  },
+    priority: {
+      type: String,
+      default: "Medium",
+    },
 
-  board: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Board",
-  },
+    listName: {
+      type: String,
+      default: "Todo",
+    },
 
-  priority: {
-    type: String,
-    enum: ["Low", "Medium", "High"],
-    default: "Medium",
+    assignedTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+
+    board: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Board",
+    },
   },
-  dueDate: Date,
-  listName: {
-    type: String,
-    enum:["Todo",
-"In Progress",
-"Completed"],
-    default: "Todo",
-  },
-}, {
-  timestamps: true,
-});
-module.exports = mongoose.model("card", CardSchema);
+  { timestamps: true }
+);
+
+module.exports = mongoose.model(
+  "Card",
+  cardSchema
+);

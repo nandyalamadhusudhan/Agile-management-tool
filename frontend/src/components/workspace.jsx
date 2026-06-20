@@ -65,12 +65,10 @@ function Workspace() {
       [e.target.name]: e.target.value,
     });
   };
-
   // CREATE WORKSPACE
   const createWorkspace = async () => {
   try {
     const token = localStorage.getItem("token");
-
     const res = await axios.post(
       "http://localhost:5000/workspace/create",
       workspaceData,
@@ -78,9 +76,7 @@ function Workspace() {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
-
     alert(res.data.message);
-
     setShowModal(false);
     setWorkspaceData({
       workspaceName: "",
