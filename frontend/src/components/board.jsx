@@ -57,6 +57,8 @@ if (res.data.length > 0) {
     );
   }
 };
+//this function update the location of the card
+
 const onDragEnd = async (result) => {
   const {
     destination,

@@ -17,7 +17,6 @@ function Sidebar() {
       });
     }
   }, []);
-
   return (
     <div className="maincontainer">
       <div className={open ? "sidebarcon active" : "sidebarcon"}>
