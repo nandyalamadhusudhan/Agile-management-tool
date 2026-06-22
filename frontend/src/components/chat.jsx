@@ -14,18 +14,17 @@ function Chat() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   useEffect(() => {
+ //to send messages to connected members   
   const fetchMessages = async () => {
     try {
       const res = await axios.get(
         `http://localhost:5000/workspace/${workspaceId}/messages`
       );
-
       setMessages(res.data);
     } catch (err) {
       console.log(err);
     }
   };
-
   fetchMessages();
   socket.connect();
   socket.emit("joinWorkspace", {
