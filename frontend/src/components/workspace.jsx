@@ -137,7 +137,7 @@ const deleteWorkspace = async(id)=>{
 
 };
 
-  // OPEN INVITE
+  // invitstion sends to all users
   const openInviteModal = (workspaceId) => {
     setSelectedWorkspace(workspaceId);
     setMemberEmail("");
