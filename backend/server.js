@@ -674,6 +674,54 @@ app.get("/api/workspaces/myteams", authMiddleware, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+app.get("/user/:id", authMiddleware,async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+    res.json({
+      name: user.name,
+      email: user.email,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+});
+app.put("/user/update/:id",authMiddleware, async (req, res) => {
+  try {
+    const { name, email } = req.body;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        name,
+        email,
+      },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+});
+
 // ---------------- START SERVER ----------------
 server.listen(5000, () => {
   console.log("Server running on port 5000");

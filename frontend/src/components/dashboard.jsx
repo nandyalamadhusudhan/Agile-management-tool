@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import "../dashboard.css";
+import { useNavigate } from "react-router-dom";
 function Dashboard() {
+  const navigate=useNavigate();
   const [username, setUsername] = useState("");
   const [stats, setStats] = useState({
   workspaces: 0,
@@ -25,7 +27,6 @@ function Dashboard() {
   const fetchStats = async () => {
     try {
       const token = localStorage.getItem("token");
-
       const res = await axios.get(
         "http://localhost:5000/dashboard",
         {
@@ -35,7 +36,6 @@ function Dashboard() {
         }
       );
       setStats(res.data);
-
     } catch (error) {
       console.log(error);
     }
@@ -73,10 +73,9 @@ function Dashboard() {
       <div className="section">
         <h2>Quick Actions</h2>
         <div className="quick-actions">
-          <button>Create Workspace</button>
-          <button>Create Board</button>
-          <button>Add Task</button>
-          <button>Invite Member</button>
+          <button onClick={() => navigate("/mainpage/workspace")}>Open Workspace</button>
+          <button onClick={() => navigate("/mainpage/teams")}>Team members</button>
+          <button onClick={() => navigate("/settings")}>Settings</button>
         </div>
       </div>
       {/* Task Overview */}

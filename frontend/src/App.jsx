@@ -8,6 +8,8 @@ import Chat from "./components/chat";
 import Team from "./components/teams";
 import Dashboard from "./components/dashboard";
 import Workspace from "./components/workspace";
+import Settings from "./components/settings";
+import HelpSupport from "./components/help";
 function App() {
   const token = localStorage.getItem("token");
   return (
@@ -44,6 +46,14 @@ function App() {
         path="/workspace/:id"
         element={<Board />}
       />
+      <Route
+  path="/settings"
+  element={<Settings />}
+/>
+<Route
+  path="/help-support"
+  element={<HelpSupport />}
+/>
     </Routes>
   );
 }

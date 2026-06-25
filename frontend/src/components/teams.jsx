@@ -25,7 +25,7 @@ function Team() {
   };
   return (
    <div className="team-page">
-  <h1>My Workspaces</h1>
+  <h1>My Team Members In Workspaces</h1>
   {workspaces.map((workspace) => (
     <div key={workspace._id} className="workspace-card">
       <div className="workspace-header">

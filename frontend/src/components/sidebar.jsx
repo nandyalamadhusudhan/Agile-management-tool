@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import "../sidebar.css";
+import { useNavigate } from "react-router-dom";
 function Sidebar() {
+  const navigate=useNavigate();
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState({
     name: "Profile",
@@ -38,22 +40,18 @@ function Sidebar() {
               <h3>Workspace</h3>
               <div className="child3-1">
                 <ul>
-                  <li>📁 Projects</li>
-                  <li>✅ Tasks</li>
-                  <li>📅 Calendar</li>
-                  <li>📂 Files</li>
-                  <li>👥 Team Members</li>
+                  <li onClick={() => navigate("/mainpage/workspace")}>📁 Projects</li>
+                  <li onClick={() => alert("Calendar feature coming soon!")}> 📅 Calendar</li>
+                  <li onClick={() => alert("Files feature coming soon!")}>📂 Files</li>
+                  <li onClick={() => navigate("/mainpage/teams")}>👥 Team Members</li>
                 </ul>
               </div>
             </div>
-
             <div className="child4">
               <h3>Communication</h3>
-
               <div className="child4-1">
                 <ul>
-                  <li>💬 Chat</li>
-                  <li>📞Meeting</li>
+                  <li onClick={()=>alert("meeting feature is comming soon!")}>📞Meeting</li>
                 </ul>
               </div>
             </div>
@@ -61,8 +59,8 @@ function Sidebar() {
               <h3>Settings</h3>
               <div className="child5-1">
                 <ul>
-                  <li>⚙️ Settings</li>
-                  <li>❓ Help & Support</li>
+                  <li onClick={() => navigate("/settings")}>⚙️ Settings</li>
+                  <li onClick={() => navigate("/help-support")}>❓ Help & Support</li>
                 </ul>
               </div>
             </div>
@@ -75,7 +73,7 @@ function Sidebar() {
                   className="avatar"
                 />
               ) : (
-                <button className="probtn">
+                <button className="probtn" onClick={() => navigate("/settings")}>
                   {user.name.charAt(0).toUpperCase()}
                 </button>
               )}
