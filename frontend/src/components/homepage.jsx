@@ -1,8 +1,16 @@
 // Home.jsx
 import "../Home.css";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 function Home() {
   const navigate = useNavigate();
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+        navigate("/mainpage");
+    } 
+}, []);
   return (
     <div className="container">
       {/* Navigation Bar */}

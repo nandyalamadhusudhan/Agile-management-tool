@@ -206,7 +206,7 @@ const deleteWorkspace = async(id)=>{
     <div className="workspace-container">
       <h1>Workspace Dashboard</h1>
       <div className="workspace-summary">
-        <h3>Total Workspaces: {workspaceCount}</h3>
+        <h3>Total Workspaces you created: {workspaceCount}</h3>
         <button
   className="create-btn"
   onClick={() => setShowModal(true)}

@@ -14,7 +14,10 @@ const app = express();
 const server=http.createServer(app);
 const { Server }=require("socket.io");
 const Invitation = require("./models/inivitation");
-const secretKey = "venkatalakshmi1";
+require("dotenv").config();
+const port = process.env.PORT;
+const mongourl=process.env.MONGO_URI;
+const secretKey = process.env.JWT_SECRET;
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -24,7 +27,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 mongoose
-  .connect("mongodb://127.0.0.1:27017/agiletool")
+  .connect(mongourl)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
   const authMiddleware = (req, res, next) => {
@@ -128,14 +131,13 @@ app.post("/register", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
 // LOGIN
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: "User not found" });
+      return res.status(400).json({ message: "User not found,please register" });
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -248,8 +250,7 @@ app.post("/workspace/create", authMiddleware, async (req, res) => {
       message: "Workspace Created Successfully",
       workspace: newWorkspace
     });
-    io.to(userId).emit("workspace-created");
-
+    io.to(req.user.id).emit("workspace-created");
   } catch (err) {
     res.status(500).json({
       message: err.message
@@ -301,14 +302,17 @@ app.get("/workspace/:workspaceId", authMiddleware, async (req, res) => {
 app.delete("/workspace/:id", authMiddleware, async (req, res) => {
   try {
     const workspace = await Workspace.findById(req.params.id);
-    console.log("Members:", workspace.members);
     if (!workspace) {
       return res.status(404).json({
         message: "Workspace not found",
       });
     }
-
-    // Send notification to all members
+    if (workspace.owner.toString() !== req.user.id) {
+  return res.status(403).json({
+    message: "Only owner can delete workspace",
+  });
+}
+// Send notification to all members
     workspace.members.forEach((memberId) => {
       io.to(memberId.toString()).emit(
         "workspace-deleted",
@@ -429,7 +433,6 @@ workspace.members.forEach((memberId) => {
 res.json({
   message: "Successfully joined workspace and Enjoy the workspace",
 });
-io.to(userId).emit("workspaceJoined");
     } catch (err) {
       console.error(err);
       res.status(500).json({
@@ -613,27 +616,29 @@ app.post("/cards", authMiddleware, async (req, res) => {
   }
 });
 //update tasks by drag and srop
-app.put("/cards/:id/move",authMiddleware,async (req, res) => {
-    try {
-      const { listName } = req.body;
-     const card = await Card.findOneAndUpdate(
-  { _id: req.params.id },
-  {
-    listName: req.body.listName
-  },
-  {
-    returnDocument: "after"
-  }
-);
- console.log("UPDATED CARD:", card);
-      res.json(card);
-    } catch (err) {
-      res.status(500).json({
-        message: err.message,
-      });
+app.put("/cards/:id/move", authMiddleware, async (req, res) => {
+
+    const card = await Card.findById(req.params.id);
+
+    if (!card) {
+        return res.status(404).json({
+            message: "Card not found"
+        });
     }
-  }
-);
+
+    if (card.assignedTo.toString() !== req.user.id) {
+        return res.status(403).json({
+            message: "Only assigned user can move this card"
+        });
+    }
+
+    card.listName = req.body.listName;
+
+    await card.save();
+
+    res.json(card);
+
+});
 app.get("/workspace/:workspaceId/members",authMiddleware,async (req, res) => {
     try {
       const workspace =
@@ -659,17 +664,19 @@ app.get("/workspace/:workspaceId/members",authMiddleware,async (req, res) => {
 app.delete("/workspace/:workspaceId/members/:memberId",authMiddleware,async (req, res) => {
     try {
       const { workspaceId, memberId } = req.params;
-
       const workspace = await Workspace.findById(
         workspaceId
       );
-
+      if (workspace.owner.toString() !== req.user.id) {
+  return res.status(403).json({
+    message: "Only owner can remove members",
+  });
+}
       workspace.members = workspace.members.filter(
         (id) => id.toString() !== memberId
       );
 
       await workspace.save();
-
       // Send notification
       io.to(memberId).emit("member-removed", {
         workspaceId,
@@ -752,6 +759,6 @@ app.put("/user/update/:id",authMiddleware, async (req, res) => {
 });
 
 // ---------------- START SERVER ----------------
-server.listen(5000, () => {
+server.listen(port, () => {
   console.log("Server running on port 5000");
 });

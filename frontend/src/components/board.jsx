@@ -18,22 +18,30 @@ function Board() {
   const [taskPriority, setTaskPriority] = useState("Medium");
   const [assignedTo, setAssignedTo] = useState("");
   const [isOwner, setIsOwner] = useState(false);
+  const [ownerId, setOwnerId] = useState("");
   const navigate=useNavigate();
+  const token = localStorage.getItem("token");
+
+const payload = token
+  ? JSON.parse(atob(token.split(".")[1]))
+  : null;
+
+const userId = payload.id; // or payload._id depending on your JWT
 useEffect(() => {
   const checkOwner = async () => {
     try {
       const token = localStorage.getItem("token");
-
       const res = await axios.get(
-        `http://localhost:5000/workspace/${workspaceId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+  `http://localhost:5000/workspace/${workspaceId}`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
 
-      setIsOwner(res.data.isOwner);
+setIsOwner(res.data.isOwner);
+setOwnerId(res.data.workspace.owner);
     } catch (err) {
       console.log(err.response?.data || err.message);
     }
@@ -196,8 +204,6 @@ const openchat=()=>{
       console.log(err.response?.data || err.message);
     }
   };
-  
-
   const createTask = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -332,7 +338,7 @@ const removeMember = async (memberId) => {
           >
             <span>{m.name}</span>
 
-            {isOwner && (
+           {isOwner && m._id !== ownerId && (
               <button
                 className="remove-member-btn"
                 onClick={() =>
@@ -410,11 +416,7 @@ const removeMember = async (memberId) => {
                             index
                           ) => (
 
-                            <Draggable
-  key={card._id}
-  draggableId={card._id}
-  index={index}
->
+                            <Draggable key={card._id} draggableId={card._id} index={index} isDragDisabled={card.assignedTo?._id !== userId}>
   {(provided, snapshot) => (
     <div
       ref={provided.innerRef}
