@@ -1,4 +1,4 @@
-import React, { useState,useEffect,useRef } from "react";
+import  { useState,useEffect,useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSearch, FaBell, FaTimes } from "react-icons/fa";
 import "../navbar.css";
@@ -14,19 +14,33 @@ function Navbar() {
     localStorage.removeItem("token");
     navigate("/login");
   };
+const fetchNotifications = async () => {
+  try {
+    const token =localStorage.getItem("token");
+    const res = await axios.get(
+      "http://localhost:5000/workspace/invitations",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setNotifications(res.data);
+  } catch (err) {
+    console.error(err);
+  }
+};
   useEffect(() => {
 
   socket.on("workspace-invited", (data) => {
-
     if(audioRef.current){
       audioRef.current.play().catch(()=>{});
     }
-
     setNotifications((prev)=>[
       data,
       ...prev
     ]);
-
     setUnreadCount((prev)=>prev+1);
   });
 
@@ -52,32 +66,9 @@ function Navbar() {
   };
 
 },[]);
-useEffect(() => {
-  fetchNotifications();
-}, []);
-const fetchNotifications = async () => {
-  try {
-    const token =
-      localStorage.getItem("token");
-
-    const res = await axios.get(
-      "http://localhost:5000/workspace/invitations",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    setNotifications(res.data);
-  } catch (err) {
-    console.error(err);
-  }
-};
 const acceptInvite = async (invitationId) => {
   try {
     const token = localStorage.getItem("token");
-
     await axios.post(
       "http://localhost:5000/workspace/accept",
       { invitationId },
@@ -87,13 +78,11 @@ const acceptInvite = async (invitationId) => {
         },
       }
     );
-
     setNotifications((prev) =>
       prev.filter(
         (n) => n._id !== invitationId
       )
     );
-
     alert(
       "Successfully joined workspace"
     );
@@ -122,7 +111,6 @@ const rejectInvite = async (invitationId) => {
         (n) => n._id !== invitationId
       )
     );
-
     alert("Invitation rejected");
   } catch (err) {
     console.error(err);
@@ -132,11 +120,9 @@ const rejectInvite = async (invitationId) => {
  return (
 <>
 <nav className="navbar">
-
   <div className="logo">
     CollabSpace
   </div>
-
   <div className="search-box">
     <FaSearch className="search-icon" />
 
@@ -205,37 +191,23 @@ const rejectInvite = async (invitationId) => {
    showNotifications ? "open" : ""
  }`}
 >
-
-
 <div className="notification-header">
-
 <h3>
  Notifications
 </h3>
-
-
 <FaTimes
  className="close-icon"
  onClick={() =>
    setShowNotifications(false)
  }
 />
-
-
 </div>
-
-
-
 <div className="notification-list">
-
-
 {notifications.map((n) => (
-
   <div
     key={n._id}
     className="notification-item"
   >
-
     {n.type === "delete" ? (
       <>
         <p>

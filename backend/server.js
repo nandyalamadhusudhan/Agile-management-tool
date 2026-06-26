@@ -200,7 +200,7 @@ app.get("/dashboard", authMiddleware, async (req, res) => {
     const completed = await Card.countDocuments({
       board: { $in: boardIds },
       assignedTo: req.user.id,
-      listName: "Done",
+      listName: "Completed",
     });
 
     // Unique team members
@@ -248,6 +248,7 @@ app.post("/workspace/create", authMiddleware, async (req, res) => {
       message: "Workspace Created Successfully",
       workspace: newWorkspace
     });
+    io.to(userId).emit("workspace-created");
 
   } catch (err) {
     res.status(500).json({
@@ -257,7 +258,9 @@ app.post("/workspace/create", authMiddleware, async (req, res) => {
 });
 app.get("/workspace/count", authMiddleware, async (req, res) => {
   try {
-    const count = await Workspace.countDocuments();
+    const count = await Workspace.countDocuments({
+    owner: req.user.id
+});
     res.json({ count });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -273,6 +276,26 @@ app.get("/workspace/all", authMiddleware, async (req, res) => {
     res.json(workspaces);
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+});
+app.get("/workspace/:workspaceId", authMiddleware, async (req, res) => {
+  try {
+    const workspace = await Workspace.findById(req.params.workspaceId);
+
+    if (!workspace) {
+      return res.status(404).json({
+        message: "Workspace not found",
+      });
+    }
+
+    res.json({
+      workspace,
+      isOwner: workspace.owner.toString() === req.user.id,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
   }
 });
 app.delete("/workspace/:id", authMiddleware, async (req, res) => {
@@ -361,12 +384,10 @@ return res.status(200).json({
 app.post("/workspace/accept",authMiddleware,async (req, res) => {
     try {
       const { invitationId } = req.body;
-
       const invitation =
         await Invitation.findById(
           invitationId
         );
-
       if (!invitation) {
         return res.status(404).json({
           message: "Invitation not found",
@@ -385,25 +406,30 @@ app.post("/workspace/accept",authMiddleware,async (req, res) => {
       }
 
       // Add receiver to members
-      if (
-        !workspace.members.includes(
-          invitation.receiver
-        )
-      ) {
-        workspace.members.push(
-          invitation.receiver
-        );
-      }
+     const exists = workspace.members.some(
+  (member) => member.toString() === invitation.receiver.toString()
+);
 
+if (!exists) {
+  workspace.members.push(invitation.receiver);
+}
       await workspace.save();
 
-      invitation.status = "Accepted";
-      await invitation.save();
+invitation.status = "Accepted";
+await invitation.save();
 
-      res.json({
-        message:
-          "Successfully joined workspace and Enjoy the workspace",
-      });
+// Notify all members of this workspace
+workspace.members.forEach((memberId) => {
+  io.to(memberId.toString()).emit("workspaceJoined", {
+    workspaceId: workspace._id,
+    workspaceName: workspace.name,
+  });
+});
+
+res.json({
+  message: "Successfully joined workspace and Enjoy the workspace",
+});
+io.to(userId).emit("workspaceJoined");
     } catch (err) {
       console.error(err);
       res.status(500).json({
@@ -447,7 +473,6 @@ app.get("/workspace/invitations",authMiddleware,async (req, res) => {
         })
           .populate("sender", "name")
           .populate("workspace", "name");
-
       res.json(invitations);
     } catch (err) {
       console.error(err);
@@ -541,8 +566,31 @@ app.post("/cards", authMiddleware, async (req, res) => {
       priority,
       assignedTo,
       boardId,
-      listName
+      listName,
     } = req.body;
+
+    const board = await Board.findById(boardId);
+
+    if (!board) {
+      return res.status(404).json({
+        message: "Board not found",
+      });
+    }
+
+    const workspace = await Workspace.findById(board.workspace);
+
+    if (!workspace) {
+      return res.status(404).json({
+        message: "Workspace not found",
+      });
+    }
+
+    // ✅ Only workspace owner can create tasks
+    if (workspace.owner.toString() !== req.user.id) {
+      return res.status(403).json({
+        message: "Only workspace owner can create tasks",
+      });
+    }
 
     const card = await Card.create({
       title,
@@ -550,33 +598,14 @@ app.post("/cards", authMiddleware, async (req, res) => {
       priority,
       assignedTo,
       board: boardId,
-      listName
+      listName,
     });
 
-    await Board.findByIdAndUpdate(
-      boardId,
-      {
-        $push: {
-          cards: card._id
-        }
-      }
-    );
+    await Board.findByIdAndUpdate(boardId, {
+      $push: { cards: card._id },
+    });
 
     res.status(201).json(card);
-
-  } catch (err) {
-    res.status(500).json({
-      message: err.message
-    });
-  }
-});
-app.delete("/cards/:id", authMiddleware, async (req, res) => {
-  try {
-    await Card.findByIdAndDelete(req.params.id);
-
-    res.json({
-      message: "Task deleted successfully",
-    });
   } catch (err) {
     res.status(500).json({
       message: err.message,

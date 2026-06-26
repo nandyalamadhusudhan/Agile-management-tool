@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import "../dashboard.css";
+import {socket} from "../socket";
 import { useNavigate } from "react-router-dom";
 function Dashboard() {
   const navigate=useNavigate();
@@ -15,14 +16,7 @@ function Dashboard() {
   inProgress: 0,
   completed: 0
 });
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      const decoded = jwtDecode(token);
-      setUsername(decoded.name);
-    }
-    fetchStats();
-  }, []);
+  
 
   const fetchStats = async () => {
     try {
@@ -40,6 +34,29 @@ function Dashboard() {
       console.log(error);
     }
   };
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decoded = jwtDecode(token);
+      setUsername(decoded.name);
+    }
+    fetchStats();
+  }, []);
+  useEffect(() => {
+  const handleWorkspaceUpdate = () => {
+    fetchStats();
+  };
+
+  socket.on("workspace-created", handleWorkspaceUpdate);
+  socket.on("workspace-deleted", handleWorkspaceUpdate);
+  socket.on("workspaceJoined", handleWorkspaceUpdate);
+
+  return () => {
+    socket.off("workspace-created", handleWorkspaceUpdate);
+    socket.off("workspace-deleted", handleWorkspaceUpdate);
+    socket.off("workspaceJoined", handleWorkspaceUpdate);
+  };
+}, []);
 
   return (
     <div className="dashboard">
@@ -96,17 +113,6 @@ function Dashboard() {
     </div>
   </div>
 </div>
-      {/* Recent Activity */}
-      <div className="activity-card">
-        <h2>Recent Activity</h2>
-        <ul>
-          <li>✅ New task created</li>
-          <li>📁 Workspace updated</li>
-          <li>👤 Member joined team</li>
-          <li>📌 New board created</li>
-        </ul>
-      </div>
-
     </div>
   );
 }

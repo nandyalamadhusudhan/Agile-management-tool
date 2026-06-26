@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import {socket} from "../socket";
 import "../workspace.css";
 function Workspace() {
   const navigate = useNavigate();
@@ -19,10 +20,7 @@ function Workspace() {
     workspaceName: "",
     description: "",
   });
-  useEffect(() => {
-    fetchWorkspaceCount();
-    fetchWorkspaces();
-  }, []);
+  
 
   // GET COUNT
   const fetchWorkspaceCount = async () => {
@@ -57,6 +55,36 @@ function Workspace() {
       console.log(err.response?.data || err.message);
     }
   };
+  useEffect(() => {
+    fetchWorkspaceCount();
+    fetchWorkspaces();
+  }, []);
+useEffect(() => {
+  socket.on("workspaceJoined", () => {
+    fetchWorkspaces();      // reload workspace list
+    fetchWorkspaceCount();  // reload workspace count
+  });
+
+  return () => {
+    socket.off("workspaceJoined");
+  };
+}, []);
+useEffect(() => {
+  const handleWorkspaceUpdate = () => {
+    fetchWorkspaces();
+    fetchWorkspaceCount();
+  };
+
+  socket.on("workspace-deleted", handleWorkspaceUpdate);
+  socket.on("workspaceJoined", handleWorkspaceUpdate);
+  socket.on("workspace-created", handleWorkspaceUpdate);
+
+  return () => {
+    socket.off("workspace-deleted", handleWorkspaceUpdate);
+    socket.off("workspaceJoined", handleWorkspaceUpdate);
+    socket.off("workspace-created", handleWorkspaceUpdate);
+  };
+}, []);
 
   // INPUT CHANGE
   const handleChange = (e) => {
@@ -114,17 +142,13 @@ const deleteWorkspace = async(id)=>{
         }
       }
     );
-
-
     setWorkspaces(
       workspaces.filter(
         w=>w._id !== id
       )
     );
 
-
     alert("Workspace deleted");
-
 
   }catch(err){
 
@@ -136,7 +160,6 @@ const deleteWorkspace = async(id)=>{
   }
 
 };
-
   // invitstion sends to all users
   const openInviteModal = (workspaceId) => {
     setSelectedWorkspace(workspaceId);

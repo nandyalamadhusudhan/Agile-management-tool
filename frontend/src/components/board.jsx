@@ -20,17 +20,29 @@ function Board() {
   const [isOwner, setIsOwner] = useState(false);
   const navigate=useNavigate();
 useEffect(() => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    const payload = JSON.parse(
-      atob(token.split(".")[1])
-    );
-    console.log(payload.id);
-    if (location.state?.owner === payload.id) {
-      setIsOwner(true);
+  const checkOwner = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await axios.get(
+        `http://localhost:5000/workspace/${workspaceId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setIsOwner(res.data.isOwner);
+    } catch (err) {
+      console.log(err.response?.data || err.message);
     }
+  };
+
+  if (workspaceId) {
+    checkOwner();
   }
-}, [location]);
+}, [workspaceId]);
 const fetchBoard = async () => {
   try {
 
@@ -49,7 +61,6 @@ const fetchBoard = async () => {
 if (res.data.length > 0) {
   setBoard(res.data[0]);
 }
-   console.log(res.data);
   } catch(err){
     console.log(
       err.response?.data ||
@@ -58,7 +69,6 @@ if (res.data.length > 0) {
   }
 };
 //this function update the location of the card
-
 const onDragEnd = async (result) => {
   const {
     destination,
@@ -75,14 +85,9 @@ const onDragEnd = async (result) => {
 
   const newStatus =
     destination.droppableId.split("||")[1];
-
-  
-
   try {
-
     const token =
       localStorage.getItem("token");
-
     await axios.put(
       `http://localhost:5000/cards/${draggableId}/move`,
       {
@@ -344,14 +349,14 @@ const removeMember = async (memberId) => {
 
     <div className="action-bar">
 
-      <button
-        className="task-btn"
-        onClick={() =>
-          setShowTaskModal(true)
-        }
-      >
-        + Add Task
-      </button>
+      {isOwner && (
+  <button
+    className="task-btn"
+    onClick={() => setShowTaskModal(true)}
+  >
+    + Add Task
+  </button>
+)}
 
       <button
         className="chat-btn"
