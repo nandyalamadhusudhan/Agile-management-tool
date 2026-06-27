@@ -34,8 +34,7 @@ function Login() {
         response.data.token
       );
       alert(response.data.message);
-      console.log(response.data.token);
-      navigate("/mainpage");
+      window.location.href = "/mainpage";
     } catch (error) {
       console.log(error);
       alert(

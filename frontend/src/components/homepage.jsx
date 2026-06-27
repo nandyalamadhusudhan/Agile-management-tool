@@ -23,7 +23,7 @@ function Home() {
       <div className="content">
         <h1>Welcome to Agile Management Tool</h1>
         <p>Manage projects and collaborate with your team in real time.</p>
-        <button className="start-btn" onClick={() => navigate("/login")}>
+        <button className="start-btn" onClick={() => navigate("/register")}>
           Real Time collaborative system
         </button>
       </div>
