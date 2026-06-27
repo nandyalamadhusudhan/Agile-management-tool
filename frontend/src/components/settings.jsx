@@ -52,7 +52,6 @@ function Settings() {
     }
   }
 );
-
     alert("Profile Updated Successfully");
     navigate("/mainpage");
   } catch (err) {

@@ -4,10 +4,8 @@ import Sidebar from "./sidebar";
 import "../mainpage.css";
 import { socket } from "../socket";
 import { useEffect } from "react";
-
 function Mainpage() {
   const navigate = useNavigate();
-
   useEffect(() => {
     socket.connect();
     const token = localStorage.getItem("token");
