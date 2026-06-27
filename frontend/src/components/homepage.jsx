@@ -9,6 +9,9 @@ function Home() {
     if (token) {
         navigate("/mainpage");
     } 
+    else{
+      navigate("/");
+    }
 }, []);
   return (
     <div className="container">
