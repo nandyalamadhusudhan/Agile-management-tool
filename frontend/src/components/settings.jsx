@@ -35,7 +35,6 @@ function Settings() {
 
   fetchProfile();
 }, []);
-
   const updateProfile = async () => {
   try {
     const token = localStorage.getItem("token");
@@ -55,6 +54,7 @@ function Settings() {
 );
 
     alert("Profile Updated Successfully");
+    navigate("/mainpage");
   } catch (err) {
     console.log(err);
   }

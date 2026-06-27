@@ -35,13 +35,30 @@ function Dashboard() {
     }
   };
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
+  const fetchUser = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
       const decoded = jwtDecode(token);
-      setUsername(decoded.name);
+
+      const res = await axios.get(
+        `https://agile-management-tool.onrender.com/user/${decoded.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setUsername(res.data.name);
+    } catch (err) {
+      console.log(err);
     }
-    fetchStats();
-  }, []);
+  };
+  fetchUser();
+  fetchStats();
+}, []);
   useEffect(() => {
   const handleWorkspaceUpdate = () => {
     fetchStats();
