@@ -17,11 +17,7 @@ function App() {
     <Routes>
       <Route
   path="/"
-  element={
-    localStorage.getItem("token")
-      ? <Navigate to="/mainpage" replace />
-      : <Home />
-  }
+  element={<Home />}
 />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
