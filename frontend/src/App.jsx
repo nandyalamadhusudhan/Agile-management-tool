@@ -12,9 +12,17 @@ import Settings from "./components/settings";
 import HelpSupport from "./components/help";
 function App() {
   const token = localStorage.getItem("token");
+  console.log(token);
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route
+  path="/"
+  element={
+    localStorage.getItem("token")
+      ? <Navigate to="/mainpage" replace />
+      : <Home />
+  }
+/>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       {/* Protected Main Layout */}
