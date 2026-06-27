@@ -49,12 +49,13 @@ mongoose
     return res.status(401).json({ message: "Invalid or Expired Token" });
   }
 };
-const io=new Server(server,{
-  cors:{
-    origin:"https://agile-management-tool.vercel.app",
-    methods:["GET","POST"],
+const io = new Server(server, {
+  cors: {
+    origin: "https://agile-management-tool.vercel.app",
+    methods: ["GET", "POST"],
+    credentials: true
   }
-})
+});
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
   socket.on("register", (userId) => {
