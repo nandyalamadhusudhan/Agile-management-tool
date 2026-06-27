@@ -22,7 +22,7 @@ function Dashboard() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-        "http://localhost:5000/dashboard",
+        "https://agile-management-tool.onrender.com/dashboard",
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -46,11 +46,9 @@ function Dashboard() {
   const handleWorkspaceUpdate = () => {
     fetchStats();
   };
-
   socket.on("workspace-created", handleWorkspaceUpdate);
   socket.on("workspace-deleted", handleWorkspaceUpdate);
   socket.on("workspaceJoined", handleWorkspaceUpdate);
-
   return () => {
     socket.off("workspace-created", handleWorkspaceUpdate);
     socket.off("workspace-deleted", handleWorkspaceUpdate);

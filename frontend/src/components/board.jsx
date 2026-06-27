@@ -32,7 +32,7 @@ useEffect(() => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-  `http://localhost:5000/workspace/${workspaceId}`,
+  `https://agile-management-tool.onrender.com/workspace/${workspaceId}`,
   {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -58,7 +58,7 @@ const fetchBoard = async () => {
       localStorage.getItem("token");
 
     const res = await axios.get(
-  `http://localhost:5000/boards/${workspaceId}`,
+  `https://agile-management-tool.onrender.com/boards/${workspaceId}`,
   {
     headers:{
       Authorization:`Bearer ${token}`
@@ -97,7 +97,7 @@ const onDragEnd = async (result) => {
     const token =
       localStorage.getItem("token");
     await axios.put(
-      `http://localhost:5000/cards/${draggableId}/move`,
+      `https://agile-management-tool.onrender.com/cards/${draggableId}/move`,
       {
         listName: newStatus
       },
@@ -192,7 +192,7 @@ const openchat=()=>{
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-        `http://localhost:5000/workspace/${workspaceId}/members`,
+        `https://agile-management-tool.onrender.com/workspace/${workspaceId}/members`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -212,7 +212,7 @@ const openchat=()=>{
   return;
 }
       await axios.post(
-  "http://localhost:5000/cards",
+  "https://agile-management-tool.onrender.com/cards",
   {
     title:taskTitle,
     description:taskDescription,
@@ -246,7 +246,7 @@ const openchat=()=>{
   try {
     const token = localStorage.getItem("token");
     await axios.delete(
-      `http://localhost:5000/cards/${cardId}`,
+      `https://agile-management-tool.onrender.com/cards/${cardId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -269,7 +269,7 @@ const openchat=()=>{
     const token = localStorage.getItem("token");
 
     await axios.delete(
-      `http://localhost:5000/boards/${boardId}`,
+      `https://agile-management-tool.onrender.com/boards/${boardId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -292,7 +292,7 @@ const removeMember = async (memberId) => {
   try {
     const token = localStorage.getItem("token");
     await axios.delete(
-      `http://localhost:5000/workspace/${workspaceId}/members/${memberId}`,
+      `https://agile-management-tool.onrender.com/workspace/${workspaceId}/members/${memberId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

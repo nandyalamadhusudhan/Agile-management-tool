@@ -27,7 +27,7 @@ function Workspace() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-        "http://localhost:5000/workspace/count",
+        "https://agile-management-tool.onrender.com/workspace/count",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -44,7 +44,7 @@ function Workspace() {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        "http://localhost:5000/workspace/all",
+        "https://agile-management-tool.onrender.com/workspace/all",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -98,7 +98,7 @@ useEffect(() => {
   try {
     const token = localStorage.getItem("token");
     const res = await axios.post(
-      "http://localhost:5000/workspace/create",
+      "https://agile-management-tool.onrender.com/workspace/create",
       workspaceData,
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -135,7 +135,7 @@ const deleteWorkspace = async(id)=>{
 
 
     await axios.delete(
-      `http://localhost:5000/workspace/${id}`,
+      `https://agile-management-tool.onrender.com/workspace/${id}`,
       {
         headers:{
           Authorization:`Bearer ${token}`
@@ -172,7 +172,7 @@ const deleteWorkspace = async(id)=>{
   try {
     const token = localStorage.getItem("token");
     const res = await axios.post(
-      "http://localhost:5000/workspace/invite",
+      "https://agile-management-tool.onrender.com/workspace/invite",
       {
         workspaceId: selectedWorkspace,
         email: memberEmail,

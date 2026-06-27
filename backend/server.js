@@ -16,18 +16,17 @@ const { Server }=require("socket.io");
 const Invitation = require("./models/inivitation");
 require("dotenv").config();
 const port = process.env.PORT;
-const mongourl=process.env.MONGO_URI;
+const mongouri=process.env.MONGO_URI;
 const secretKey = process.env.JWT_SECRET;
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-  })
-);
+app.use(cors({
+ origin:"https://agile-management-tool.onrender.com",
+ credentials:true
+}))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 mongoose
-  .connect(mongourl)
+  .connect(mongouri)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
   const authMiddleware = (req, res, next) => {

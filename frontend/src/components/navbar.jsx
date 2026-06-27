@@ -18,7 +18,7 @@ const fetchNotifications = async () => {
   try {
     const token =localStorage.getItem("token");
     const res = await axios.get(
-      "http://localhost:5000/workspace/invitations",
+      "https://agile-management-tool.onrender.com/workspace/invitations",
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -70,7 +70,7 @@ const acceptInvite = async (invitationId) => {
   try {
     const token = localStorage.getItem("token");
     await axios.post(
-      "http://localhost:5000/workspace/accept",
+      "https://agile-management-tool.onrender.com/workspace/accept",
       { invitationId },
       {
         headers: {
@@ -97,7 +97,7 @@ const rejectInvite = async (invitationId) => {
     const token = localStorage.getItem("token");
 
     await axios.post(
-      "http://localhost:5000/workspace/reject",
+      "https://agile-management-tool.onrender.com/workspace/reject",
       { invitationId },
       {
         headers: {

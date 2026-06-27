@@ -140,7 +140,7 @@ http://localhost:5173
 Backend:
 
 ```
-http://localhost:5000
+https://agile-management-tool.onrender.com
 ```
 
 ---

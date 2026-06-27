@@ -19,7 +19,7 @@ function Settings() {
       const userId = decoded.id;
 
       const res = await axios.get(
-  `http://localhost:5000/user/${userId}`,
+  `https://agile-management-tool.onrender.com/user/${userId}`,
   {
     headers: {
       Authorization: `Bearer ${token}`
@@ -42,7 +42,7 @@ function Settings() {
     const decoded = jwtDecode(token);
 
     await axios.put(
-  `http://localhost:5000/user/update/${decoded.id}`,
+  `https://agile-management-tool.onrender.com/user/update/${decoded.id}`,
   {
     name,
     email,

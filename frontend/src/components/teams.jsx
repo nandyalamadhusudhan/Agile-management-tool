@@ -11,7 +11,7 @@ function Team() {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        "http://localhost:5000/api/workspaces/myteams",
+        "https://agile-management-tool.onrender.com/api/workspaces/myteams",
         {
           headers: {
             Authorization: `Bearer ${token}`

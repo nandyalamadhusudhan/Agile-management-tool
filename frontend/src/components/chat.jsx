@@ -18,7 +18,7 @@ function Chat() {
   const fetchMessages = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/workspace/${workspaceId}/messages`
+        `https://agile-management-tool.onrender.com/workspace/${workspaceId}/messages`
       );
       setMessages(res.data);
     } catch (err) {
