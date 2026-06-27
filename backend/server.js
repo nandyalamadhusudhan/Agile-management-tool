@@ -19,7 +19,7 @@ const port = process.env.PORT;
 const mongouri=process.env.MONGO_URI;
 const secretKey = process.env.JWT_SECRET;
 app.use(cors({
- origin:"https://agile-management-tool.vercel.app/",
+ origin:"https://agile-management-tool.vercel.app",
  credentials:true
 }))
 app.use(express.json());
