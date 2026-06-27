@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import axios from "axios";
+import {socket} from "../socket";
 import "../board.css";
 import { useNavigate } from "react-router-dom";
 import {DragDropContext,Droppable,Draggable} from "@hello-pangea/dnd";

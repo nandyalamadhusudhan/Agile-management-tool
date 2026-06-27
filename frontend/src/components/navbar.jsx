@@ -30,9 +30,11 @@ const fetchNotifications = async () => {
     console.error(err);
   }
 };
+useEffect(() => {
+    fetchNotifications();
+}, []);
   useEffect(() => {
     fetchNotifications();
-
     const handleWorkspaceInvited = (data) => {
       if (audioRef.current) {
         audioRef.current.play().catch(() => {});
@@ -40,7 +42,6 @@ const fetchNotifications = async () => {
       setNotifications((prev) => [data, ...prev]);
       setUnreadCount((prev) => prev + 1);
     };
-
     const handleWorkspaceDeleted = (data) => {
       if (audioRef.current) {
         audioRef.current.play().catch(() => {});
