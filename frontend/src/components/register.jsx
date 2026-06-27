@@ -26,7 +26,7 @@ function Register() {
 
     try {
       const response = await axios.post(
-        "https://agile-management-tool.onrender.com/register",
+        `${import.meta.env.VITE_API_BASE || "http://localhost:5000"}/register`, 
         formData
       );
       alert(response.data.message);
