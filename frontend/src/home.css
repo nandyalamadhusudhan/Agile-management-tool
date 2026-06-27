@@ -8,7 +8,7 @@
 }
 
 .container {
-  background-image: url("./assets/home.jpeg");
+  background-image: url("../assets/home.jpeg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
