@@ -22,11 +22,9 @@ function Board() {
   const [ownerId, setOwnerId] = useState("");
   const navigate=useNavigate();
   const token = localStorage.getItem("token");
-
 const payload = token
   ? JSON.parse(atob(token.split(".")[1]))
   : null;
-
 const userId = payload.id; // or payload._id depending on your JWT
 useEffect(() => {
   const checkOwner = async () => {
@@ -40,24 +38,20 @@ useEffect(() => {
     },
   }
 );
-
 setIsOwner(res.data.isOwner);
 setOwnerId(res.data.workspace.owner);
     } catch (err) {
       console.log(err.response?.data || err.message);
     }
   };
-
   if (workspaceId) {
     checkOwner();
   }
 }, [workspaceId]);
 const fetchBoard = async () => {
   try {
-
     const token =
       localStorage.getItem("token");
-
     const res = await axios.get(
   `https://agile-management-tool.onrender.com/boards/${workspaceId}`,
   {
@@ -66,7 +60,6 @@ const fetchBoard = async () => {
     }
   }
 );
-
 if (res.data.length > 0) {
   setBoard(res.data[0]);
 }
@@ -75,6 +68,24 @@ if (res.data.length > 0) {
       err.response?.data ||
       err.message
     );
+  }
+};
+const deleteCard = async (cardId) => {
+  const confirmDelete = window.confirm("Delete this task?");
+  if (!confirmDelete) return;
+  try {
+    const token = localStorage.getItem("token");
+    await axios.delete(
+      `https://agile-management-tool.onrender.com/cards/${cardId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    fetchBoard();
+  } catch (err) {
+    console.log(err.response?.data || err.message);
   }
 };
 //this function update the location of the card
@@ -138,14 +149,14 @@ const renderCard = (card) => (
         >
           {card.priority || "Medium"}
         </span>
-        <button
-          className="task-delete-btn"
-          onClick={() =>
-            deleteCard(card._id)
-          }
-        >
-          Delete
-        </button>
+        {isOwner && (
+  <button
+    className="task-delete-btn"
+    onClick={() => deleteCard(card._id)}
+  >
+    Delete
+  </button>
+)}
       </div>
     </div>
     {card.description && (
@@ -239,26 +250,7 @@ const openchat=()=>{
       console.log(err.response?.data || err.message);
     }
   };
-  const deleteCard = async (cardId) => {
-  const confirmDelete = window.confirm(
-    "Delete this task?"
-  );
-  if (!confirmDelete) return;
-  try {
-    const token = localStorage.getItem("token");
-    await axios.delete(
-      `https://agile-management-tool.onrender.com/cards/${cardId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    fetchBoard(); // refresh boards after deleting
-  } catch (err) {
-    console.log(err.response?.data || err.message);
-  }
-};
+  
   /*const deleteBoard = async (boardId) => {
   const confirmDelete = window.confirm(
     "Delete this board and all tasks?"

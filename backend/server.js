@@ -648,13 +648,24 @@ app.put("/cards/:id/move", authMiddleware, async (req, res) => {
             message: "Only assigned user can move this card"
         });
     }
-
     card.listName = req.body.listName;
-
     await card.save();
-
     res.json(card);
+});
+app.delete("/cards/:id", authMiddleware, async (req, res) => {
+  try {
+    const card = await Card.findById(req.params.id);
 
+    if (!card) {
+      return res.status(404).json({ message: "Card not found" });
+    }
+
+    await Card.findByIdAndDelete(req.params.id);
+
+    res.json({ message: "Card deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 app.get("/workspace/:workspaceId/members",authMiddleware,async (req, res) => {
     try {
@@ -662,13 +673,11 @@ app.get("/workspace/:workspaceId/members",authMiddleware,async (req, res) => {
         await Workspace.findById(
           req.params.workspaceId
         ).populate("members", "name email");
-
       if (!workspace) {
         return res.status(404).json({
           message: "Workspace not found",
         });
       }
-
       res.json(workspace.members);
     } catch (err) {
       console.error(err);
