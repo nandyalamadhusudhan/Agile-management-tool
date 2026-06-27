@@ -14,31 +14,37 @@ function Chat() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   useEffect(() => {
- //to send messages to connected members   
-  const fetchMessages = async () => {
-    try {
-      const res = await axios.get(
-        `https://agile-management-tool.onrender.com/workspace/${workspaceId}/messages`
-      );
-      setMessages(res.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  fetchMessages();
-  socket.connect();
-  socket.emit("joinWorkspace", {
-    workspaceId,
-    token,
-  });
-  socket.on("receiveMessage", (msg) => {
-    setMessages((prev) => [...prev, msg]);
-  });
+    // ensure socket is connected (main page may have been unmounted)
+    if (!socket.connected) socket.connect();
 
-  return () => {
-    socket.off("receiveMessage");
-  };
-}, [workspaceId]);
+    const fetchMessages = async () => {
+      try {
+        const res = await axios.get(
+          `https://agile-management-tool.onrender.com/workspace/${workspaceId}/messages`
+        );
+        setMessages(res.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchMessages();
+
+    socket.emit("joinWorkspace", {
+      workspaceId,
+      token,
+    });
+
+    const handleReceiveMessage = (msg) => {
+      setMessages((prev) => [...prev, msg]);
+    };
+
+    socket.on("receiveMessage", handleReceiveMessage);
+
+    return () => {
+      socket.off("receiveMessage", handleReceiveMessage);
+    };
+  }, [workspaceId, token]);
 const sendMessage = () => {
   if (!message.trim()) return;
 

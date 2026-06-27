@@ -25,47 +25,46 @@ const fetchNotifications = async () => {
         },
       }
     );
-
     setNotifications(res.data);
   } catch (err) {
     console.error(err);
   }
 };
   useEffect(() => {
+    fetchNotifications();
 
-  socket.on("workspace-invited", (data) => {
-    if(audioRef.current){
-      audioRef.current.play().catch(()=>{});
-    }
-    setNotifications((prev)=>[
-      data,
-      ...prev
-    ]);
-    setUnreadCount((prev)=>prev+1);
-  });
+    const handleWorkspaceInvited = (data) => {
+      if (audioRef.current) {
+        audioRef.current.play().catch(() => {});
+      }
+      setNotifications((prev) => [data, ...prev]);
+      setUnreadCount((prev) => prev + 1);
+    };
 
-  // ADD THIS
-  socket.on("workspace-deleted",(data)=>{
-    if(audioRef.current){
-      audioRef.current.play().catch(()=>{});
-    }
-   console.log("DELETE EVENT RECEIVED:", data);
-    setNotifications((prev)=>[
-      {
-        _id: Date.now(),
-        type:"delete",
-        message:data.message
-      },
-      ...prev
-    ]);
-    setUnreadCount((prev)=>prev+1);
-  });
-  return ()=>{
-    socket.off("workspace-invited");
-    socket.off("workspace-deleted");
-  };
+    const handleWorkspaceDeleted = (data) => {
+      if (audioRef.current) {
+        audioRef.current.play().catch(() => {});
+      }
+      console.log("DELETE EVENT RECEIVED:", data);
+      setNotifications((prev) => [
+        {
+          _id: Date.now(),
+          type: "delete",
+          message: data.message,
+        },
+        ...prev,
+      ]);
+      setUnreadCount((prev) => prev + 1);
+    };
 
-},[]);
+    socket.on("workspace-invited", handleWorkspaceInvited);
+    socket.on("workspace-deleted", handleWorkspaceDeleted);
+
+    return () => {
+      socket.off("workspace-invited", handleWorkspaceInvited);
+      socket.off("workspace-deleted", handleWorkspaceDeleted);
+    };
+  }, []);
 const acceptInvite = async (invitationId) => {
   try {
     const token = localStorage.getItem("token");

@@ -17,10 +17,11 @@ function Mainpage() {
       );
       socket.emit("register", payload.id);
     }
-    return () => {
-      socket.disconnect();
-    };
+    // Keep the singleton socket connected for the whole session.
+    // Disconnect only on logout if needed.
+    return () => {};
   }, []);
+
   useEffect(() => {
   socket.on("member-removed", (data) => {
     alert(data.message);

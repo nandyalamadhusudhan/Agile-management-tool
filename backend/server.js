@@ -18,10 +18,22 @@ require("dotenv").config();
 const port = process.env.PORT;
 const mongouri=process.env.MONGO_URI;
 const secretKey = process.env.JWT_SECRET;
+const allowedOrigins = [
+  "https://agile-management-tool.vercel.app",
+  "https://agile-management-tool.onrender.com",
+  "http://localhost:5173",
+  "http://localhost:3000",
+];
 app.use(cors({
- origin:"https://agile-management-tool.vercel.app",
- credentials:true
-}))
+  origin: (origin, cb) => {
+    // allow requests with no origin (like mobile apps, curl)
+    if (!origin) return cb(null, true);
+    if (allowedOrigins.includes(origin)) return cb(null, true);
+    return cb(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -51,11 +63,16 @@ mongoose
 };
 const io = new Server(server, {
   cors: {
-    origin: "https://agile-management-tool.vercel.app",
+    origin: (origin, cb) => {
+      if (!origin) return cb(null, true);
+      if (allowedOrigins.includes(origin)) return cb(null, true);
+      return cb(new Error("Not allowed by CORS"));
+    },
     methods: ["GET", "POST"],
-    credentials: true
-  }
+    credentials: true,
+  },
 });
+
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
   socket.on("register", (userId) => {
