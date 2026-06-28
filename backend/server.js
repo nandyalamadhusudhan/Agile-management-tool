@@ -34,10 +34,7 @@ app.use(cors({
   },
   credentials: true,
 }));
-
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
 mongoose
   .connect(mongouri)
   .then(() => console.log("MongoDB Connected"))
@@ -73,7 +70,6 @@ const io = new Server(server, {
     credentials: true,
   },
 });
-
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
   socket.on("register", (userId) => {
@@ -299,12 +295,17 @@ app.get("/workspace/all", authMiddleware, async (req, res) => {
 });
 app.get("/workspace/:workspaceId", authMiddleware, async (req, res) => {
   try {
-    const workspace = await Workspace.findById(req.params.workspaceId);
+    const { workspaceId } = req.params;
+
+    // Validate MongoDB ObjectId format first
+    if (!mongoose.Types.ObjectId.isValid(workspaceId)) {
+      return res.status(400).json({ message: "Invalid Workspace ID format" });
+    }
+
+    const workspace = await Workspace.findById(workspaceId);
 
     if (!workspace) {
-      return res.status(404).json({
-        message: "Workspace not found",
-      });
+      return res.status(404).json({ message: "Workspace not found" });
     }
 
     res.json({
@@ -312,11 +313,10 @@ app.get("/workspace/:workspaceId", authMiddleware, async (req, res) => {
       isOwner: workspace.owner.toString() === req.user.id,
     });
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    res.status(500).json({ message: err.message });
   }
 });
+
 app.delete("/workspace/:id", authMiddleware, async (req, res) => {
   try {
     const workspace = await Workspace.findById(req.params.id);
