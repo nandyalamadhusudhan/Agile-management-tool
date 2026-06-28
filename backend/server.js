@@ -23,6 +23,7 @@ const allowedOrigins = [
   "https://agile-management-tool.onrender.com",
   "http://localhost:5173",
   "http://localhost:3000",
+  "https://realtimecollaborativeworkspace.vercel.app"
 ];
 app.use(cors({
   origin: (origin, cb) => {
