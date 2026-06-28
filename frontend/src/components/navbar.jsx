@@ -48,6 +48,28 @@ function Navbar() {
       console.error("Error fetching historical notifications:", err);
     }
   };
+  // inside your React notification UI componen
+
+useEffect(() => {
+  // A. Load historical notifications from DB on initial load
+  const loadOfflineNotifications = async () => {
+    const res = await fetch("https://agile-management-tool.onrender.com/notifications/pending", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+    });
+    const data = await res.json();
+    setNotifications(data);
+  };
+
+  loadOfflineNotifications();
+
+  // B. Catch live real-time signals if they are currently online
+  socket.on("workspace-invited", (newInvite) => {
+    setNotifications((prev) => [newInvite, ...prev]);
+  });
+
+  return () => socket.off("workspace-invited");
+}, []);
+
 
   // 3. FIXED: Consolidated double useEffect loops to guarantee stable room mounting
   useEffect(() => {
