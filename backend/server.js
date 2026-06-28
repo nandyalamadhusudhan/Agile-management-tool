@@ -358,51 +358,67 @@ app.delete("/workspace/:id", authMiddleware, async (req, res) => {
 app.post("/workspace/invite", authMiddleware, async (req, res) => {
   try {
     const { workspaceId, email } = req.body;
+    
     const workspace = await Workspace.findById(workspaceId);
     if (!workspace) {
       return res.status(404).json({ message: "Workspace not found" });
     }
+    
     if (workspace.owner.toString() !== req.user.id) {
       return res.status(403).json({ message: "Only owner can add members" });
     }
+    
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+    
     const alreadyMember = workspace.members.some(
-     member => member.toString() === user._id.toString()
-   );
+      member => member.toString() === user._id.toString()
+    );
 
-if (alreadyMember) {
-  return res.status(400).json({
-    message: "Already a member"
-  });
-}
-  const invitation = await Invitation.create({
-  workspace: workspace._id,
-  sender: req.user.id,
-  receiver: user._id,
-});
+    if (alreadyMember) {
+      return res.status(400).json({ message: "Already a member" });
+    }
 
-io.to(user._id.toString()).emit(
-  "workspace-invited",
-  {
-    _id: invitation._id,
-    sender: {
-      name: req.user.name,
-    },
-    workspace: {
-      name: workspace.name,
-    },
-  }
-);
-return res.status(200).json({
-  message: "INVITATION REQUEST SEND WAITING FOR THE RESPONSE",
-});
+    // Check if an invitation is already pending to avoid duplicates
+    const existingInvite = await Invitation.findOne({
+      workspace: workspace._id,
+      receiver: user._id,
+      status: "pending" // Add this if your Invitation model tracks status
+    });
+
+    if (existingInvite) {
+      return res.status(400).json({ message: "Invitation already pending for this user" });
+    }
+
+    const invitation = await Invitation.create({
+      workspace: workspace._id,
+      sender: req.user.id,
+      receiver: user._id,
+    });
+
+    // Force strict string conversion for target room delivery
+    const receiverRoomId = user._id.toString();
+
+    io.to(receiverRoomId).emit("workspace-invited", {
+      _id: invitation._id,
+      sender: {
+        name: req.user.name,
+      },
+      workspace: {
+        name: workspace.name,
+      },
+    });
+
+    return res.status(200).json({
+      message: "INVITATION REQUEST SENT, WAITING FOR THE RESPONSE",
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
+
 app.post("/workspace/accept",authMiddleware,async (req, res) => {
     try {
       const { invitationId } = req.body;
